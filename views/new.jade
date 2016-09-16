@@ -1,16 +1,32 @@
 extends layout
 
 block content
-  form(method="post", action="/schedules")
+  script.
+    function blankAlert() {
+      const trimScheName = document.formNew.scheduleName.value.trim();
+      const trimCandidates = document.formNew.candidates.value.trim();
+      if (trimScheName === "") {
+        alert("予定名が入力されていません");
+        return false;
+      } else if (trimCandidates === "") {
+        alert("候補日程を入力してください");
+        return false;
+      } else {
+        return true;
+      };
+    }
+  form(method="post", action="/schedules", name="formNew", onsubmit="return blankAlert()")
     input(type="hidden" name="_csrf" value!="#{csrfToken}")
     div(class="form-group")
       label(for="scheduleName") 予定名
+      label(for="scheduleName" style="color: #ff0000") ※必須
       input(id="scheduleName" class="form-control" type="text" name="scheduleName")
     div(class="form-group")
       label(for="memo") メモ
       textarea(id="memo" class="form-control" name="memo")
     div(class="form-group")
-      label(for="candidates") 候補日程 (改行して複数入力してください)
+      label(for="candidates") 候補日程 (改行で複数作成できます)
+      label(for="candidates" style="color: #ff0000") ※1つ以上入力してください
       textarea(id="candidates" class="form-control" name="candidates")
-    button(class="btn btn-info" type="submit") 作成
+    button(class="btn btn-info" type="submit") 予定をつくる
     p
