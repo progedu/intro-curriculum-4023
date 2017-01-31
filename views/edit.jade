@@ -14,11 +14,16 @@ block content
       label 既存の日程候補
       ul(class="list-group")
         each candidate in candidates
-          li(class="list-group-item") #{candidate.candidateName}
+          // ↓↓↓↓↓ debug ここから修正 ↓↓↓↓↓
+          // li(class="list-group-item") #{candidate.candidateName}
+          input(type="hidden" name="cndGroupID" value="#{candidate.candidateId}")
+          input(class="list-group-item" type="text" name="cndGroupName" value="#{candidate.candidateName}")
+          // ↑↑↑↑↑ debug ここまで ↑↑↑↑↑
       label(for="candidates") 候補日程の追加 (改行して複数入力してください)
       textarea(id="candidates" class="form-control" name="candidates")
     div
       button(class="btn btn-info" type="submit") 以上の内容で予定を編集する
+      a(class="btn btn-info" style="margin: 10px;" href="/schedules/#{schedule.scheduleId}") キャンセルして前画面に戻る
   h3 危険な変更
   form(method="post", action="/schedules/#{schedule.scheduleId}?delete=1")
     input(type="hidden" name="_csrf" value!="#{csrfToken}")
