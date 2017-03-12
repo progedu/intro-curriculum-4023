@@ -45,25 +45,31 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
-	let $ = __webpack_require__(1);
-	let global = Function('return this;')();
+	const $ = __webpack_require__(1);
+	const global = Function('return this;')();
 	global.jQuery = $;
-	let bootstrap = __webpack_require__(2);
+	const bootstrap = __webpack_require__(2);
+	const bulkButton = $('#bulkbutton');
+	const button_name = $('.availability-toggle-button');
 
-	$('.availability-toggle-button').each((i, e) => {
-	  let button = $(e);
+
+	button_name.each((i, e) => {
+	  const button = $(e);
 	  button.click(() => {
-	    let scheduleId = button.data('schedule-id');
-	    let userId = button.data('user-id');
-	    let candidateId = button.data('candidate-id');
-	    let availability = parseInt(button.data('availability'));
-	    let nextAvailability = (availability + 1) % 3;
+	    //console.log(`i:  ${i}`);
+	    //console.log($('.availability-toggle-button').length); //試行錯誤した結果ボツ
+	    const scheduleId = button.data('schedule-id');
+	    const userId = button.data('user-id');
+	    const candidateId = button.data('candidate-id');
+	    const availability = parseInt(button.data('availability'));
+	    const nextAvailability = (availability + 1) % 3;
 	    $.post(`/schedules/${scheduleId}/users/${userId}/candidates/${candidateId}`,
 	      { availability: nextAvailability },
 	      (data) => {
 	        button.data('availability', data.availability);
 	        const availabilityLabels = ['欠', '？', '出'];
 	        button.text(availabilityLabels[data.availability]);
+	        console.log(availabilityLabels[data.availability]);
 
 	        const buttonStyles = ['btn-danger', 'btn-default', 'btn-success'];
 	        button.removeClass('btn-danger btn-default btn-success');
@@ -76,11 +82,51 @@
 	  });
 	});
 
-	let buttonSelfComment = $('#self-comment-button');
+
+	let num = 0;
+	bulkButton.click(() => {
+
+	  button_name.each((i, e) => {
+	    const button = $(e);
+
+	    const scheduleId = button.data('schedule-id');
+	    const userId = button.data('user-id');
+	    const candidateId = button.data('candidate-id');
+	    const availability = num;
+	    //const nextAvailability = (availability + 1) % 3;
+	    $.post(`/schedules/${scheduleId}/users/${userId}/candidates/${candidateId}`,
+	      { availability: availability },
+	      (data) => {
+	        button.data('availability', data.availability);
+	        const availabilityLabels = ['欠', '？', '出'];
+	        button.text(availabilityLabels[data.availability]);
+	        console.log(availabilityLabels[data.availability]);
+
+	        const buttonStyles = ['btn-danger', 'btn-default', 'btn-success'];
+	        button.removeClass('btn-danger btn-default btn-success');
+	        button.addClass(buttonStyles[data.availability]);
+
+	        const tdAvailabilityClasses = ['bg-danger', 'bg-default', 'bg-success'];
+	        button.parent().removeClass('bg-danger bg-default bg-success');
+	        button.parent().addClass(tdAvailabilityClasses[data.availability]);
+
+	      });
+	  });
+	  const bulkButtonStyles = ['btn-danger', 'btn-default', 'btn-success'];
+	  bulkButton.removeClass('btn-danger btn-default btn-success btn-info');
+	  bulkButton.addClass(bulkButtonStyles[num]);
+
+	  //num++;
+	  num = (num + 1) % 3;
+	  console.log(num);
+	});
+
+
+	const buttonSelfComment = $('#self-comment-button');
 	buttonSelfComment.click(() => {
-	  let scheduleId = buttonSelfComment.data('schedule-id');
-	  let userId = buttonSelfComment.data('user-id');
-	  let comment = prompt('コメントを255文字以内で入力してください。');
+	  const scheduleId = buttonSelfComment.data('schedule-id');
+	  const userId = buttonSelfComment.data('user-id');
+	  const comment = prompt('コメントを255文字以内で入力してください。');
 	  if (comment) {
 	    $.post(`/schedules/${scheduleId}/users/${userId}/comments`,
 	      { comment: comment },
@@ -95,7 +141,7 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*!
-	 * jQuery JavaScript Library v2.2.1
+	 * jQuery JavaScript Library v2.2.0
 	 * http://jquery.com/
 	 *
 	 * Includes Sizzle.js
@@ -105,7 +151,7 @@
 	 * Released under the MIT license
 	 * http://jquery.org/license
 	 *
-	 * Date: 2016-02-22T19:11Z
+	 * Date: 2016-01-08T20:02Z
 	 */
 
 	(function( global, factory ) {
@@ -161,7 +207,7 @@
 
 
 	var
-		version = "2.2.1",
+		version = "2.2.0",
 
 		// Define a local copy of jQuery
 		jQuery = function( selector, context ) {
@@ -4575,7 +4621,7 @@
 		if ( fn === false ) {
 			fn = returnFalse;
 		} else if ( !fn ) {
-			return elem;
+			return this;
 		}
 
 		if ( one === 1 ) {
@@ -5224,14 +5270,14 @@
 		rscriptTypeMasked = /^true\/(.*)/,
 		rcleanScript = /^\s*<!(?:\[CDATA\[|--)|(?:\]\]|--)>\s*$/g;
 
-	// Manipulating tables requires a tbody
 	function manipulationTarget( elem, content ) {
-		return jQuery.nodeName( elem, "table" ) &&
-			jQuery.nodeName( content.nodeType !== 11 ? content : content.firstChild, "tr" ) ?
+		if ( jQuery.nodeName( elem, "table" ) &&
+			jQuery.nodeName( content.nodeType !== 11 ? content : content.firstChild, "tr" ) ) {
 
-			elem.getElementsByTagName( "tbody" )[ 0 ] ||
-				elem.appendChild( elem.ownerDocument.createElement( "tbody" ) ) :
-			elem;
+			return elem.getElementsByTagName( "tbody" )[ 0 ] || elem;
+		}
+
+		return elem;
 	}
 
 	// Replace/restore the type attribute of script elements for safe DOM manipulation
@@ -5738,7 +5784,7 @@
 			// FF meanwhile throws on frame elements through "defaultView.getComputedStyle"
 			var view = elem.ownerDocument.defaultView;
 
-			if ( !view || !view.opener ) {
+			if ( !view.opener ) {
 				view = window;
 			}
 
@@ -5887,18 +5933,15 @@
 			style = elem.style;
 
 		computed = computed || getStyles( elem );
-		ret = computed ? computed.getPropertyValue( name ) || computed[ name ] : undefined;
-
-		// Support: Opera 12.1x only
-		// Fall back to style even without computed
-		// computed is undefined for elems on document fragments
-		if ( ( ret === "" || ret === undefined ) && !jQuery.contains( elem.ownerDocument, elem ) ) {
-			ret = jQuery.style( elem, name );
-		}
 
 		// Support: IE9
 		// getPropertyValue is only needed for .css('filter') (#12537)
 		if ( computed ) {
+			ret = computed.getPropertyValue( name ) || computed[ name ];
+
+			if ( ret === "" && !jQuery.contains( elem.ownerDocument, elem ) ) {
+				ret = jQuery.style( elem, name );
+			}
 
 			// A tribute to the "awesome hack by Dean Edwards"
 			// Android Browser returns percentage for some values,
@@ -7948,7 +7991,7 @@
 					// But now, this "simulate" function is used only for events
 					// for which stopPropagation() is noop, so there is no need for that anymore.
 					//
-					// For the 1.x branch though, guard for "click" and "submit"
+					// For the compat branch though, guard for "click" and "submit"
 					// events is still used, but was moved to jQuery.event.stopPropagation function
 					// because `originalEvent` should point to the original event for the constancy
 					// with other events and for more focused logic
@@ -9718,8 +9761,11 @@
 				}
 
 				// Add offsetParent borders
-				parentOffset.top += jQuery.css( offsetParent[ 0 ], "borderTopWidth", true );
-				parentOffset.left += jQuery.css( offsetParent[ 0 ], "borderLeftWidth", true );
+				// Subtract offsetParent scroll positions
+				parentOffset.top += jQuery.css( offsetParent[ 0 ], "borderTopWidth", true ) -
+					offsetParent.scrollTop();
+				parentOffset.left += jQuery.css( offsetParent[ 0 ], "borderLeftWidth", true ) -
+					offsetParent.scrollLeft();
 			}
 
 			// Subtract parent offsets and element margins
@@ -9950,10 +9996,10 @@
 /***/ function(module, exports) {
 
 	/* ========================================================================
-	 * Bootstrap: transition.js v3.3.6
+	 * Bootstrap: transition.js v3.3.7
 	 * http://getbootstrap.com/javascript/#transitions
 	 * ========================================================================
-	 * Copyright 2011-2015 Twitter, Inc.
+	 * Copyright 2011-2016 Twitter, Inc.
 	 * Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
 	 * ======================================================================== */
 
@@ -10015,10 +10061,10 @@
 /***/ function(module, exports) {
 
 	/* ========================================================================
-	 * Bootstrap: alert.js v3.3.6
+	 * Bootstrap: alert.js v3.3.7
 	 * http://getbootstrap.com/javascript/#alerts
 	 * ========================================================================
-	 * Copyright 2011-2015 Twitter, Inc.
+	 * Copyright 2011-2016 Twitter, Inc.
 	 * Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
 	 * ======================================================================== */
 
@@ -10034,7 +10080,7 @@
 	    $(el).on('click', dismiss, this.close)
 	  }
 
-	  Alert.VERSION = '3.3.6'
+	  Alert.VERSION = '3.3.7'
 
 	  Alert.TRANSITION_DURATION = 150
 
@@ -10047,7 +10093,7 @@
 	      selector = selector && selector.replace(/.*(?=#[^\s]*$)/, '') // strip for ie7
 	    }
 
-	    var $parent = $(selector)
+	    var $parent = $(selector === '#' ? [] : selector)
 
 	    if (e) e.preventDefault()
 
@@ -10115,10 +10161,10 @@
 /***/ function(module, exports) {
 
 	/* ========================================================================
-	 * Bootstrap: button.js v3.3.6
+	 * Bootstrap: button.js v3.3.7
 	 * http://getbootstrap.com/javascript/#buttons
 	 * ========================================================================
-	 * Copyright 2011-2015 Twitter, Inc.
+	 * Copyright 2011-2016 Twitter, Inc.
 	 * Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
 	 * ======================================================================== */
 
@@ -10135,7 +10181,7 @@
 	    this.isLoading = false
 	  }
 
-	  Button.VERSION  = '3.3.6'
+	  Button.VERSION  = '3.3.7'
 
 	  Button.DEFAULTS = {
 	    loadingText: 'loading...'
@@ -10157,10 +10203,10 @@
 
 	      if (state == 'loadingText') {
 	        this.isLoading = true
-	        $el.addClass(d).attr(d, d)
+	        $el.addClass(d).attr(d, d).prop(d, true)
 	      } else if (this.isLoading) {
 	        this.isLoading = false
-	        $el.removeClass(d).removeAttr(d)
+	        $el.removeClass(d).removeAttr(d).prop(d, false)
 	      }
 	    }, this), 0)
 	  }
@@ -10224,10 +10270,15 @@
 
 	  $(document)
 	    .on('click.bs.button.data-api', '[data-toggle^="button"]', function (e) {
-	      var $btn = $(e.target)
-	      if (!$btn.hasClass('btn')) $btn = $btn.closest('.btn')
+	      var $btn = $(e.target).closest('.btn')
 	      Plugin.call($btn, 'toggle')
-	      if (!($(e.target).is('input[type="radio"]') || $(e.target).is('input[type="checkbox"]'))) e.preventDefault()
+	      if (!($(e.target).is('input[type="radio"], input[type="checkbox"]'))) {
+	        // Prevent double click on radios, and the double selections (so cancellation) on checkboxes
+	        e.preventDefault()
+	        // The target component still receive the focus
+	        if ($btn.is('input,button')) $btn.trigger('focus')
+	        else $btn.find('input:visible,button:visible').first().trigger('focus')
+	      }
 	    })
 	    .on('focus.bs.button.data-api blur.bs.button.data-api', '[data-toggle^="button"]', function (e) {
 	      $(e.target).closest('.btn').toggleClass('focus', /^focus(in)?$/.test(e.type))
@@ -10241,10 +10292,10 @@
 /***/ function(module, exports) {
 
 	/* ========================================================================
-	 * Bootstrap: carousel.js v3.3.6
+	 * Bootstrap: carousel.js v3.3.7
 	 * http://getbootstrap.com/javascript/#carousel
 	 * ========================================================================
-	 * Copyright 2011-2015 Twitter, Inc.
+	 * Copyright 2011-2016 Twitter, Inc.
 	 * Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
 	 * ======================================================================== */
 
@@ -10272,7 +10323,7 @@
 	      .on('mouseleave.bs.carousel', $.proxy(this.cycle, this))
 	  }
 
-	  Carousel.VERSION  = '3.3.6'
+	  Carousel.VERSION  = '3.3.7'
 
 	  Carousel.TRANSITION_DURATION = 600
 
@@ -10484,13 +10535,14 @@
 /***/ function(module, exports) {
 
 	/* ========================================================================
-	 * Bootstrap: collapse.js v3.3.6
+	 * Bootstrap: collapse.js v3.3.7
 	 * http://getbootstrap.com/javascript/#collapse
 	 * ========================================================================
-	 * Copyright 2011-2015 Twitter, Inc.
+	 * Copyright 2011-2016 Twitter, Inc.
 	 * Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
 	 * ======================================================================== */
 
+	/* jshint latedef: false */
 
 	+function ($) {
 	  'use strict';
@@ -10514,7 +10566,7 @@
 	    if (this.options.toggle) this.toggle()
 	  }
 
-	  Collapse.VERSION  = '3.3.6'
+	  Collapse.VERSION  = '3.3.7'
 
 	  Collapse.TRANSITION_DURATION = 350
 
@@ -10701,10 +10753,10 @@
 /***/ function(module, exports) {
 
 	/* ========================================================================
-	 * Bootstrap: dropdown.js v3.3.6
+	 * Bootstrap: dropdown.js v3.3.7
 	 * http://getbootstrap.com/javascript/#dropdowns
 	 * ========================================================================
-	 * Copyright 2011-2015 Twitter, Inc.
+	 * Copyright 2011-2016 Twitter, Inc.
 	 * Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
 	 * ======================================================================== */
 
@@ -10721,7 +10773,7 @@
 	    $(element).on('click.bs.dropdown', this.toggle)
 	  }
 
-	  Dropdown.VERSION = '3.3.6'
+	  Dropdown.VERSION = '3.3.7'
 
 	  function getParent($this) {
 	    var selector = $this.attr('data-target')
@@ -10872,10 +10924,10 @@
 /***/ function(module, exports) {
 
 	/* ========================================================================
-	 * Bootstrap: modal.js v3.3.6
+	 * Bootstrap: modal.js v3.3.7
 	 * http://getbootstrap.com/javascript/#modals
 	 * ========================================================================
-	 * Copyright 2011-2015 Twitter, Inc.
+	 * Copyright 2011-2016 Twitter, Inc.
 	 * Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
 	 * ======================================================================== */
 
@@ -10906,7 +10958,7 @@
 	    }
 	  }
 
-	  Modal.VERSION  = '3.3.6'
+	  Modal.VERSION  = '3.3.7'
 
 	  Modal.TRANSITION_DURATION = 300
 	  Modal.BACKDROP_TRANSITION_DURATION = 150
@@ -11013,7 +11065,9 @@
 	    $(document)
 	      .off('focusin.bs.modal') // guard against infinite focus loop
 	      .on('focusin.bs.modal', $.proxy(function (e) {
-	        if (this.$element[0] !== e.target && !this.$element.has(e.target).length) {
+	        if (document !== e.target &&
+	            this.$element[0] !== e.target &&
+	            !this.$element.has(e.target).length) {
 	          this.$element.trigger('focus')
 	        }
 	      }, this))
@@ -11215,11 +11269,11 @@
 /***/ function(module, exports) {
 
 	/* ========================================================================
-	 * Bootstrap: tooltip.js v3.3.6
+	 * Bootstrap: tooltip.js v3.3.7
 	 * http://getbootstrap.com/javascript/#tooltip
 	 * Inspired by the original jQuery.tipsy by Jason Frame
 	 * ========================================================================
-	 * Copyright 2011-2015 Twitter, Inc.
+	 * Copyright 2011-2016 Twitter, Inc.
 	 * Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
 	 * ======================================================================== */
 
@@ -11242,7 +11296,7 @@
 	    this.init('tooltip', element, options)
 	  }
 
-	  Tooltip.VERSION  = '3.3.6'
+	  Tooltip.VERSION  = '3.3.7'
 
 	  Tooltip.TRANSITION_DURATION = 150
 
@@ -11533,9 +11587,11 @@
 
 	    function complete() {
 	      if (that.hoverState != 'in') $tip.detach()
-	      that.$element
-	        .removeAttr('aria-describedby')
-	        .trigger('hidden.bs.' + that.type)
+	      if (that.$element) { // TODO: Check whether guarding this code with this `if` is really necessary.
+	        that.$element
+	          .removeAttr('aria-describedby')
+	          .trigger('hidden.bs.' + that.type)
+	      }
 	      callback && callback()
 	    }
 
@@ -11578,7 +11634,10 @@
 	      // width and height are missing in IE8, so compute them manually; see https://github.com/twbs/bootstrap/issues/14093
 	      elRect = $.extend({}, elRect, { width: elRect.right - elRect.left, height: elRect.bottom - elRect.top })
 	    }
-	    var elOffset  = isBody ? { top: 0, left: 0 } : $element.offset()
+	    var isSvg = window.SVGElement && el instanceof window.SVGElement
+	    // Avoid using $.offset() on SVGs since it gives incorrect results in jQuery 3.
+	    // See https://github.com/twbs/bootstrap/issues/20280
+	    var elOffset  = isBody ? { top: 0, left: 0 } : (isSvg ? null : $element.offset())
 	    var scroll    = { scroll: isBody ? document.documentElement.scrollTop || document.body.scrollTop : $element.scrollTop() }
 	    var outerDims = isBody ? { width: $(window).width(), height: $(window).height() } : null
 
@@ -11694,6 +11753,7 @@
 	      that.$tip = null
 	      that.$arrow = null
 	      that.$viewport = null
+	      that.$element = null
 	    })
 	  }
 
@@ -11735,10 +11795,10 @@
 /***/ function(module, exports) {
 
 	/* ========================================================================
-	 * Bootstrap: popover.js v3.3.6
+	 * Bootstrap: popover.js v3.3.7
 	 * http://getbootstrap.com/javascript/#popovers
 	 * ========================================================================
-	 * Copyright 2011-2015 Twitter, Inc.
+	 * Copyright 2011-2016 Twitter, Inc.
 	 * Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
 	 * ======================================================================== */
 
@@ -11755,7 +11815,7 @@
 
 	  if (!$.fn.tooltip) throw new Error('Popover requires tooltip.js')
 
-	  Popover.VERSION  = '3.3.6'
+	  Popover.VERSION  = '3.3.7'
 
 	  Popover.DEFAULTS = $.extend({}, $.fn.tooltip.Constructor.DEFAULTS, {
 	    placement: 'right',
@@ -11849,10 +11909,10 @@
 /***/ function(module, exports) {
 
 	/* ========================================================================
-	 * Bootstrap: scrollspy.js v3.3.6
+	 * Bootstrap: scrollspy.js v3.3.7
 	 * http://getbootstrap.com/javascript/#scrollspy
 	 * ========================================================================
-	 * Copyright 2011-2015 Twitter, Inc.
+	 * Copyright 2011-2016 Twitter, Inc.
 	 * Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
 	 * ======================================================================== */
 
@@ -11878,7 +11938,7 @@
 	    this.process()
 	  }
 
-	  ScrollSpy.VERSION  = '3.3.6'
+	  ScrollSpy.VERSION  = '3.3.7'
 
 	  ScrollSpy.DEFAULTS = {
 	    offset: 10
@@ -12027,10 +12087,10 @@
 /***/ function(module, exports) {
 
 	/* ========================================================================
-	 * Bootstrap: tab.js v3.3.6
+	 * Bootstrap: tab.js v3.3.7
 	 * http://getbootstrap.com/javascript/#tabs
 	 * ========================================================================
-	 * Copyright 2011-2015 Twitter, Inc.
+	 * Copyright 2011-2016 Twitter, Inc.
 	 * Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
 	 * ======================================================================== */
 
@@ -12047,7 +12107,7 @@
 	    // jscs:enable requireDollarBeforejQueryAssignment
 	  }
 
-	  Tab.VERSION = '3.3.6'
+	  Tab.VERSION = '3.3.7'
 
 	  Tab.TRANSITION_DURATION = 150
 
@@ -12188,10 +12248,10 @@
 /***/ function(module, exports) {
 
 	/* ========================================================================
-	 * Bootstrap: affix.js v3.3.6
+	 * Bootstrap: affix.js v3.3.7
 	 * http://getbootstrap.com/javascript/#affix
 	 * ========================================================================
-	 * Copyright 2011-2015 Twitter, Inc.
+	 * Copyright 2011-2016 Twitter, Inc.
 	 * Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
 	 * ======================================================================== */
 
@@ -12217,7 +12277,7 @@
 	    this.checkPosition()
 	  }
 
-	  Affix.VERSION  = '3.3.6'
+	  Affix.VERSION  = '3.3.7'
 
 	  Affix.RESET    = 'affix affix-top affix-bottom'
 

@@ -3,10 +3,15 @@ const $ = require('jquery');
 const global = Function('return this;')();
 global.jQuery = $;
 const bootstrap = require('bootstrap');
+const bulkButton = $('#bulkbutton');
+const button_name = $('.availability-toggle-button');
 
-$('.availability-toggle-button').each((i, e) => {
+
+button_name.each((i, e) => {
   const button = $(e);
   button.click(() => {
+    //console.log(`i:  ${i}`);
+    //console.log($('.availability-toggle-button').length); //試行錯誤した結果ボツ
     const scheduleId = button.data('schedule-id');
     const userId = button.data('user-id');
     const candidateId = button.data('candidate-id');
@@ -18,6 +23,7 @@ $('.availability-toggle-button').each((i, e) => {
         button.data('availability', data.availability);
         const availabilityLabels = ['欠', '？', '出'];
         button.text(availabilityLabels[data.availability]);
+        console.log(availabilityLabels[data.availability]);
 
         const buttonStyles = ['btn-danger', 'btn-default', 'btn-success'];
         button.removeClass('btn-danger btn-default btn-success');
@@ -29,6 +35,46 @@ $('.availability-toggle-button').each((i, e) => {
       });
   });
 });
+
+
+let num = 0;
+bulkButton.click(() => {
+
+  button_name.each((i, e) => {
+    const button = $(e);
+
+    const scheduleId = button.data('schedule-id');
+    const userId = button.data('user-id');
+    const candidateId = button.data('candidate-id');
+    const availability = num;
+    //const nextAvailability = (availability + 1) % 3;
+    $.post(`/schedules/${scheduleId}/users/${userId}/candidates/${candidateId}`,
+      { availability: availability },
+      (data) => {
+        button.data('availability', data.availability);
+        const availabilityLabels = ['欠', '？', '出'];
+        button.text(availabilityLabels[data.availability]);
+        console.log(availabilityLabels[data.availability]);
+
+        const buttonStyles = ['btn-danger', 'btn-default', 'btn-success'];
+        button.removeClass('btn-danger btn-default btn-success');
+        button.addClass(buttonStyles[data.availability]);
+
+        const tdAvailabilityClasses = ['bg-danger', 'bg-default', 'bg-success'];
+        button.parent().removeClass('bg-danger bg-default bg-success');
+        button.parent().addClass(tdAvailabilityClasses[data.availability]);
+
+      });
+  });
+  const bulkButtonStyles = ['btn-danger', 'btn-default', 'btn-success'];
+  bulkButton.removeClass('btn-danger btn-default btn-success btn-info');
+  bulkButton.addClass(bulkButtonStyles[num]);
+
+  //num++;
+  num = (num + 1) % 3;
+  console.log(num);
+});
+
 
 const buttonSelfComment = $('#self-comment-button');
 buttonSelfComment.click(() => {

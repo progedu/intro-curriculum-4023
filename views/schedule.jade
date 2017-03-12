@@ -8,6 +8,10 @@ block content
       p(style="white-space:pre;") #{schedule.memo}
     div(class="panel-footer")
       p 作成者: #{schedule.user.username}
+  div(class="form-group")
+    label(for="shareURL") 共有用 URL:
+    - var herokuURL = process.env.HEROKU_URL ? process.env.HEROKU_URL : 'http://localhost:8000/'
+    input(id="shareURL" class="form-control" type="text" value="#{herokuURL}schedules/#{schedule.scheduleId}/")
   - var isMine = parseInt(user.id) === schedule.user.userId
   if isMine
     div
@@ -15,9 +19,17 @@ block content
   h3 出欠表
   table(class="table table-bordered")
     tr
-      th 予定
+      th(rowspan="2") 予定
       each user in users
         th #{user.username}
+    tr
+      each user in users
+        if isMine
+          td
+            button(id="bulkbutton" class="btn-xs btn-info") 一括変更
+
+
+
     each candidate in candidates
       tr
         th #{candidate.candidateName}
