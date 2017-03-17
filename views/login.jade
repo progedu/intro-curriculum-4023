@@ -1,4 +1,11 @@
 extends layout
 
 block content
-  a(class="btn btn-info" href="/auth/github") GitHubでログイン
+  div
+    a(class="btn btn-info" href="/auth/github" style="padding:2px 5px")
+      i(class="fa fa-github" aria-hidden="true" style="font-size:200%; margin-right:5px")
+      span(style="vertical-align: 20%;") GitHubでログイン
+  div(style="margin-top:5px")
+    a(class="btn btn-info" href="/auth/twitter" style="padding:2px 5px")
+      i(class="fa fa-twitter" aria-hidden="true" style="font-size:200%; margin-right:5px")
+      span(style="vertical-align: 20%;") Twitterでログイン
