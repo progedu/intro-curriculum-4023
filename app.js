@@ -30,6 +30,10 @@ var GitHubStrategy = require('passport-github2').Strategy;
 var GITHUB_CLIENT_ID = process.env.GITHUB_CLIENT_ID || '2f831cb3d4aac02393aa';
 var GITHUB_CLIENT_SECRET = process.env.GITHUB_CLIENT_SECRET || '9fbc340ac0175123695d2dedfbdf5a78df3b8067';
 
+var TwitterStrategy = require('passport-twitter').Strategy;
+var TWITTER_CONSUMER_KEY = process.env.TWITTER_CONSUMER_KEY || 'M32EBYh4y107FYYLE5vHFWlsS';
+var TWITTER_CONSUMER_SECRET = process.env.TWITTER_CONSUMER_SECRET || 'iBPsYEQ9QCRTUx47NkvKoSlmsYCU2W298ihPZYELsQoyja2cJN';
+
 passport.serializeUser(function (user, done) {
   done(null, user);
 });
@@ -45,10 +49,31 @@ passport.use(new GitHubStrategy({
   callbackURL: process.env.HEROKU_URL ? process.env.HEROKU_URL + 'auth/github/callback' : 'http://localhost:8000/auth/github/callback'
 },
   function (accessToken, refreshToken, profile, done) {
+    profile.__icon = profile._json.avatar_url;
     process.nextTick(function () {
       User.upsert({
         userId: profile.id,
-        username: profile.username
+        username: profile.username,
+        icon: profile.__icon
+      }).then(() => {
+        done(null, profile);
+      });
+    });
+  }
+  ));
+
+passport.use(new TwitterStrategy({
+  consumerKey: TWITTER_CONSUMER_KEY,
+  consumerSecret: TWITTER_CONSUMER_SECRET,
+  callbackURL: process.env.HEROKU_URL ? process.env.HEROKU_URL + 'auth/twitter/callback' : 'http://localhost:8000/auth/twitter/callback'
+},
+  function (accessToken, refreshToken, profile, done) {
+    profile.__icon = profile.photos[0].value;
+    process.nextTick(function () {
+      User.upsert({
+        userId: profile.id,
+        username: profile.username,
+        icon: profile.__icon
       }).then(() => {
         done(null, profile);
       });
@@ -96,6 +121,26 @@ app.get('/auth/github',
 
 app.get('/auth/github/callback',
   passport.authenticate('github', { failureRedirect: '/login' }),
+  function (req, res) {
+    var loginFrom = req.cookies.loginFrom;
+    // オープンリダイレクタ脆弱性対策
+    if (loginFrom &&
+     loginFrom.indexOf('http://') < 0 &&
+     loginFrom.indexOf('https://') < 0) {
+      res.clearCookie('loginFrom');
+      res.redirect(loginFrom);
+    } else {
+      res.redirect('/');
+    }
+  });
+
+app.get('/auth/twitter',
+  passport.authenticate('twitter'),
+  function (req, res) {
+  });
+
+app.get('/auth/twitter/callback',
+  passport.authenticate('twitter', { failureRedirect: '/login' }),
   function (req, res) {
     var loginFrom = req.cookies.loginFrom;
     // オープンリダイレクタ脆弱性対策

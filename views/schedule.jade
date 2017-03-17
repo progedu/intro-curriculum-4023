@@ -7,7 +7,13 @@ block content
     div(class="panel-body")
       p(style="white-space:pre;") #{schedule.memo}
     div(class="panel-footer")
-      p 作成者: #{schedule.user.username}
+      p 作成者:
+        img(height="15" width="15" src="#{schedule.user.icon}")
+        span #{schedule.user.username}
+  div(class="form-group")
+    label(for="shareURL") 共有用 URL:
+    - var herokuURL = process.env.HEROKU_URL ? process.env.HEROKU_URL : 'http://localhost:8000/'
+    input(id="shareURL" class="form-control" type="text" value="#{herokuURL}schedules/#{schedule.scheduleId}/")
   - var isMine = parseInt(user.id) === schedule.user.userId
   if isMine
     div

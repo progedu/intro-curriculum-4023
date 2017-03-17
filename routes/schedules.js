@@ -36,7 +36,7 @@ router.get('/:scheduleId', authenticationEnsurer, (req, res, next) => {
     include: [
       {
         model: User,
-        attributes: ['userId', 'username']
+        attributes: ['userId', 'username', 'icon']
       }],
     where: {
       scheduleId: req.params.scheduleId
@@ -61,7 +61,7 @@ router.get('/:scheduleId', authenticationEnsurer, (req, res, next) => {
       include: [
         {
           model: User,
-          attributes: ['userId', 'username']
+          attributes: ['userId', 'username', 'icon']
         }
       ],
       where: { scheduleId: storedSchedule.scheduleId },
@@ -174,7 +174,7 @@ router.post('/:scheduleId', authenticationEnsurer, csrfProtection, (req, res, ne
           }).then((candidates) => {
             // 追加されているかチェック
             const candidateNames = parseCandidateNames(req);
-            if (candidateNames) {
+            if (candidateNames && !(candidateNames.length === 1 && candidateNames[0] === '')) {
               createCandidatesAndRedirect(candidateNames, schedule.scheduleId, res);
             } else {
               res.redirect('/schedules/' + schedule.scheduleId);
