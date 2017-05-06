@@ -43,3 +43,33 @@ buttonSelfComment.click(() => {
       });
   }
 });
+
+// 予定名が空のデータが作成されないようにする（予定名が空だとクリックできない）
+// jQuery の特殊な書き方を勉強しつつ作成
+const scheduleRecordForm = $('.schedule-record');  // 予定の作成・編集するフォームの class 名
+scheduleRecordForm.submit(() => {          // 送信イベントを操作する
+  const inputNode = $('#scheduleName');  // 予定名の欄（ input タグ）
+  // 予定名が空欄の場合、警告文を表示して送信を中止する
+  if (inputNode.val() === '')  {
+    if (!$('label[for="scheduleName"]').children('b').text())  // 既に警告文が表示されているかどうか
+      // label 要素内に b 要素の警告文を追加
+      $('label[for="scheduleName"]').append('<b style="color:red"> ※予定名は必須です</b>');
+    inputNode.focus();  // フォーカスする
+    return false;  // 送信中止
+  }
+  // 送信成功
+  // ....
+});
+
+// Flatpickr でカレンダーを表示される部分
+Flatpickr.localize(Flatpickr.l10ns.ja);  // カレンダーの月名が日本語になる
+const candidateDays = $('.list-group-item');
+// 一度登録した日付を編集時に再選択できないようにする
+const candidateArr = [];  // 登録した日付を入れる配列
+for (var i = 0; i < candidateDays.length; i++)
+  candidateArr.push(candidateDays[i].innerText);
+flatpickr('#candidates', {
+  mode: 'multiple',
+  minDate: 'today',
+  defaultDate: candidateArr,
+  dateFormat: 'Y年m月d日 (D)' });

@@ -3,13 +3,14 @@ const express = require('express');
 const router = express.Router();
 const authenticationEnsurer = require('./authentication-ensurer');
 const uuid = require('node-uuid');
+const csrf = require('csurf');
+const csrfProtection = csrf({ cookie: true });
+
 const Schedule = require('../models/schedule');
 const Candidate = require('../models/candidate');
 const User = require('../models/user');
 const Availability = require('../models/availability');
 const Comment = require('../models/comment');
-const csrf = require('csurf');
-const csrfProtection = csrf({ cookie: true });
 
 router.get('/new', authenticationEnsurer, csrfProtection, (req, res, next) => {
   res.render('new', { user: req.user, csrfToken: req.csrfToken() });
@@ -173,12 +174,12 @@ router.post('/:scheduleId', authenticationEnsurer, csrfProtection, (req, res, ne
             order: '"candidateId" ASC'
           }).then((candidates) => {
             // 追加されているかチェック
-            const candidateNames = parseCandidateNames(req);
-            if (candidateNames) {
+            const candidateNames = parseCandidateNames(req, candidates);
+            //if (candidateNames) {
               createCandidatesAndRedirect(candidateNames, schedule.scheduleId, res);
-            } else {
-              res.redirect('/schedules/' + schedule.scheduleId);
-            }
+            //} else {
+              //res.redirect('/schedules/' + schedule.scheduleId);
+            //}
           });
         });
       } else {
@@ -229,6 +230,7 @@ function deleteScheduleAggregate(scheduleId, done, err) {
 router.deleteScheduleAggregate = deleteScheduleAggregate;
 
 function createCandidatesAndRedirect(candidateNames, scheduleId, res) {
+  if (candidateNames && !(candidateNames.length == 1 && candidateNames[0] === '')) {
     const candidates = candidateNames.map((c) => { return {
       candidateName: c,
       scheduleId: scheduleId
@@ -236,10 +238,30 @@ function createCandidatesAndRedirect(candidateNames, scheduleId, res) {
     Candidate.bulkCreate(candidates).then(() => {
           res.redirect('/schedules/' + scheduleId);
     });
+  } else {
+    res.redirect('/schedules/' + scheduleId);
+  }
 }
 
-function parseCandidateNames(req) {
-  return req.body.candidates.trim().split('\n').map((s) => s.trim());
+function parseCandidateNames(req, candidates) {
+  if (!candidates) {  // 予定作成 POST
+    return req.body.candidates.trim().split(';').map((s) => s.trim());
+  } else {      // 編集 POST
+    const reqCandidates = req.body.candidates.trim().split(';').map((s) => s.trim());
+    const kizonCandidates = candidates.map((c) => {return c.candidateName;});
+    let result = [];
+    for (let i = 0; i < reqCandidates.length; i++) {
+      let isEqual = false;
+      for (let j = 0; j < kizonCandidates.length; j++) {
+        if (reqCandidates[i] == kizonCandidates[j]) {
+          isEqual = true;
+          break;
+        }
+      }
+      if (!isEqual) result.push(reqCandidates[i]);
+    }
+    return result;
+  }
 }
 
 module.exports = router;

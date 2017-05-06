@@ -1,8 +1,10 @@
 'use strict';
 const express = require('express');
 const router = express.Router();
-const Schedule = require('../models/schedule');
 const moment = require('moment-timezone');
+moment.locale('ja', {weekdaysShort: ['日', '月', '火', '水', '木', '金', '土']});
+
+const Schedule = require('../models/schedule');
 
 /* GET home page. */
 router.get('/', (req, res, next) => {
@@ -15,7 +17,8 @@ router.get('/', (req, res, next) => {
       order: '"updatedAt" DESC'
     }).then((schedules) => {
       schedules.forEach((schedule) => {
-        schedule.formattedUpdatedAt = moment(schedule.updatedAt).tz('Asia/Tokyo').format('YYYY/MM/DD HH:mm');
+        schedule.formattedUpdatedAt
+          = moment(schedule.updatedAt).tz('Asia/Tokyo').format('YYYY/MM/DD HH:mm (ddd)');
       });
       res.render('index', {
         title: title,

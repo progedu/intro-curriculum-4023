@@ -334,3 +334,50 @@ describe('/schedules/:scheduleId?delete=1', () => {
     });
   });
 });
+/*
+// メインユーザー の作った予定に anotheruser というユーザーでアクセスして出欠選択とコメントをさせる
+describe('他のユーザーが作成した予定に出欠選択とコメントをさせるテスト', () => {
+  before(() => {
+    passportStub.install(app);
+    passportStub.login({ id: 555, username: 'anotheruser' });
+  });
+
+  after(() => {
+    passportStub.logout();
+    passportStub.uninstall(app);
+  });
+
+  it('anotheruser が他のユーザーが作成した予定に出欠選択とコメントをさせる', (done) => {
+    User.upsert({ userId: 555, username: 'anotheruser' }).then(() => {
+          const scheduleId = 'ここにアクセスした予定ページのID';
+          Candidate.findAll({
+            where: { scheduleId: scheduleId }
+          }).then((candidates) => {
+            // 更新がされることをテスト
+            candidates.forEach((c) => {
+              request(app)
+                .post(`/schedules/${scheduleId}/users/${555}/candidates/${c.candidateId}`)
+                .send({ availability: 2 })  // 出席に更新
+                .expect('{"status":"OK","availability":2}')
+                .end((err, res) => {
+                  if (err) done(err);
+                  done()
+                });
+            });
+          }).then(() => {
+            request(app)
+              .post(`/schedules/${scheduleId}/users/${555}/comments`)
+              .send({ comment: 'anotheruser です' })
+              .expect('{"status":"OK","anotheruser です"}')
+              .end((err, res) => {
+                if (err) done(err);
+                done();
+              });
+          }).then(() => {
+            console.log('一連の処理が終了したのでここが処理される（表示される）。');
+            done();
+          });
+    });
+  });
+});
+*/
