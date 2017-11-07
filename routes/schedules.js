@@ -10,12 +10,21 @@ const Availability = require('../models/availability');
 const Comment = require('../models/comment');
 const csrf = require('csurf');
 const csrfProtection = csrf({ cookie: true });
+const { check, validationResult } = require('express-validator/check');
+const { matchedData, sanitize } = require('express-validator/filter');
 
 router.get('/new', authenticationEnsurer, csrfProtection, (req, res, next) => {
   res.render('new', { user: req.user, csrfToken: req.csrfToken() });
 });
 
-router.post('/', authenticationEnsurer, csrfProtection, (req, res, next) => {
+router.post('/', authenticationEnsurer, csrfProtection,[
+check('scheduleName').isLength({min: 1})
+],
+ (req, res, next) => {
+   const errors = validationResult(req);
+   if(!errors.isEmpty()){
+     return res.status(422).json({errors: errors.mapped()});
+   }
   const scheduleId = uuid.v4();
   const updatedAt = new Date();
   Schedule.create({
