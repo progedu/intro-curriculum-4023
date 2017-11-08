@@ -17,26 +17,31 @@ router.get('/new', authenticationEnsurer, csrfProtection, (req, res, next) => {
   res.render('new', { user: req.user, csrfToken: req.csrfToken() });
 });
 
-router.post('/', authenticationEnsurer, csrfProtection,[
-check('scheduleName').isLength({min: 1})
+router.post('/', authenticationEnsurer, csrfProtection, [
+  check('scheduleName').isLength({ min: 1 }).withMessage('予定名は必須入力です'),
+  check('candidates').isLength({ min: 1 }).withMessage('候補日程は必須入力です')
 ],
- (req, res, next) => {
-   const errors = validationResult(req);
-   if(!errors.isEmpty()){
-     return res.status(422).json({errors: errors.mapped()});
-   }
-  const scheduleId = uuid.v4();
-  const updatedAt = new Date();
-  Schedule.create({
-    scheduleId: scheduleId,
-    scheduleName: req.body.scheduleName.slice(0, 255),
-    memo: req.body.memo,
-    createdBy: req.user.id,
-    updatedAt: updatedAt
-  }).then((schedule) => {
-    createCandidatesAndRedirect(parseCandidateNames(req), scheduleId, res);
+  (req, res, next) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      res.render('new', {
+        errors: errors.mapped(),
+        csrfToken: req.csrfToken()
+      });
+    } else {
+      const scheduleId = uuid.v4();
+      const updatedAt = new Date();
+      Schedule.create({
+        scheduleId: scheduleId,
+        scheduleName: req.body.scheduleName.slice(0, 255),
+        memo: req.body.memo,
+        createdBy: req.user.id,
+        updatedAt: updatedAt
+      }).then((schedule) => {
+        createCandidatesAndRedirect(parseCandidateNames(req), scheduleId, res);
+      });
+    }
   });
-});
 
 router.get('/:scheduleId', authenticationEnsurer, (req, res, next) => {
   let storedSchedule = null;
@@ -238,13 +243,15 @@ function deleteScheduleAggregate(scheduleId, done, err) {
 router.deleteScheduleAggregate = deleteScheduleAggregate;
 
 function createCandidatesAndRedirect(candidateNames, scheduleId, res) {
-    const candidates = candidateNames.map((c) => { return {
+  const candidates = candidateNames.map((c) => {
+    return {
       candidateName: c,
       scheduleId: scheduleId
-    };});
-    Candidate.bulkCreate(candidates).then(() => {
-          res.redirect('/schedules/' + scheduleId);
-    });
+    };
+  });
+  Candidate.bulkCreate(candidates).then(() => {
+    res.redirect('/schedules/' + scheduleId);
+  });
 }
 
 function parseCandidateNames(req) {
