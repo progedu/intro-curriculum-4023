@@ -3,6 +3,7 @@ const express = require('express');
 const router = express.Router();
 const Schedule = require('../models/schedule');
 const moment = require('moment-timezone');
+const url = require('url');
 
 /* GET home page. */
 router.get('/', (req, res, next) => {
@@ -27,5 +28,6 @@ router.get('/', (req, res, next) => {
     res.render('index', { title: title, user: req.user });
   }
 });
+
 
 module.exports = router;

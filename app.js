@@ -26,9 +26,16 @@ User.sync().then(() => {
   });
 });
 
+
 var GitHubStrategy = require('passport-github2').Strategy;
 var GITHUB_CLIENT_ID = process.env.GITHUB_CLIENT_ID || '2f831cb3d4aac02393aa';
 var GITHUB_CLIENT_SECRET = process.env.GITHUB_CLIENT_SECRET || '9fbc340ac0175123695d2dedfbdf5a78df3b8067';
+
+
+var FacebookStrategy = require('passport-facebook').Strategy;
+var FACEBOOK_APP_ID = process.env.FACEBOOK_APP_ID || '718735515003898';
+var FACEBOOK_APP_SECRET = process.env.FACEBOOK_APP_SECRET || '9a9fad81b96e39036573bdd19a211e64';
+
 
 passport.serializeUser(function (user, done) {
   done(null, user);
@@ -54,7 +61,24 @@ passport.use(new GitHubStrategy({
       });
     });
   }
-  ));
+));
+
+passport.use(new FacebookStrategy({
+  clientID: FACEBOOK_APP_ID,
+  clientSecret: FACEBOOK_APP_SECRET,
+  callbackURL: process.env.HEROKU_URL ? process.env.HEROKU_URL + 'auth/facebook/callback' : "http://localhost:8000/auth/facebook/callback"
+},
+  function(accessToken, refreshToken, profile, done) {
+    process.nextTick(function () {
+      User.upsert({
+        userId: profile.id,
+        username: profile.displayName //facebookの場合、displayNameに名前が格納されているため
+      }).then(() => {
+        done(null, profile);
+      });
+    });
+  }
+));
 
 var routes = require('./routes/index');
 var login = require('./routes/login');
@@ -62,6 +86,7 @@ var logout = require('./routes/logout');
 var schedules = require('./routes/schedules');
 var availabilities = require('./routes/availabilities');
 var comments = require('./routes/comments');
+var candidates = require('./routes/candidates')
 
 var app = express();
 app.use(helmet());
@@ -78,7 +103,8 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.use(session({ secret: 'e55be81b307c1c09', resave: false, saveUninitialized: false }));
+//app.use(session({ secret: 'e55be81b307c1c09', resave: false, saveUninitialized: false })); //元
+app.use(session({ secret: 'e55be81b307c1c00', resave: false, saveUninitialized: false }));
 app.use(passport.initialize());
 app.use(passport.session());
 
@@ -88,16 +114,39 @@ app.use('/logout', logout);
 app.use('/schedules', schedules);
 app.use('/schedules', availabilities);
 app.use('/schedules', comments);
+app.use('/schedules', candidates);
 
 app.get('/auth/github',
   passport.authenticate('github', { scope: ['user:email'] }),
   function (req, res) {
   });
 
+
+app.get('/auth/facebook',
+  //passport.authenticate('facebook'),
+  passport.authenticate('facebook', { scope: ['email']}),
+  function(req, res){
+    // The request will be redirected to Facebook for authentication, so this
+    // function will not be called.
+  });
+
+
 app.get('/auth/github/callback',
   passport.authenticate('github', { failureRedirect: '/login' }),
   function (req, res) {
-    var loginFrom = req.cookies.loginFrom;
+    openRedirecter(req, res);
+  });
+
+app.get('/auth/facebook/callback', 
+  passport.authenticate('facebook', { failureRedirect: '/login' }),
+  function (req, res) {
+    // facebookではreq.user.usernameに値が入らないので入れておく
+    req.user.username = req.user.displayName;
+    openRedirecter(req, res);
+  });
+
+function openRedirecter(req, res) {
+  var loginFrom = req.cookies.loginFrom;
     // オープンリダイレクタ脆弱性対策
     if (loginFrom &&
      loginFrom.indexOf('http://') < 0 &&
@@ -107,7 +156,7 @@ app.get('/auth/github/callback',
     } else {
       res.redirect('/');
     }
-  });
+}
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

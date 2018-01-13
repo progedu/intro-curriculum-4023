@@ -8,10 +8,16 @@ block content
       p(style="white-space:pre;") #{schedule.memo}
     div(class="panel-footer")
       p 作成者: #{schedule.user.username}
-  - var isMine = parseInt(user.id) === schedule.user.userId
+  - var isMine = user.id === schedule.user.userId // facebookのIDは桁数が大きく判定できないのでparseIntは削除
   if isMine
     div
       a(class="btn btn-info" href="/schedules/#{schedule.scheduleId}/edit") この予定を編集する
+  div(class="form-group" )
+    br
+    label(for="shareURL") 共有用のURL：
+    - var urlInform = process.env.HEROKU_URL ? process.env.HEROKU_URL + '/schedules/' + schedule.scheduleId + "/" : 'http://localhost:8000/schedules/' + schedule.scheduleId + "/"
+    input(id="shareURL" class="form-control" type="text" value="#{urlInform}")
+    button(class="clipboard" type="submit")クリップボードにコピー
   h3 出欠表
   table(class="table table-bordered")
     tr
@@ -50,3 +56,4 @@ block content
           td
             p
               small #{commentMap.get(user.userId)}
+

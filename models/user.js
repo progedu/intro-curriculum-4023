@@ -2,9 +2,10 @@
 const loader = require('./sequelize-loader');
 const Sequelize = loader.Sequelize;
 
+//userId系は計算する必要はないので、INTEGER(またはBIGINT）ではなくSTRINGに
 const User = loader.database.define('users', {
   userId: {
-    type: Sequelize.INTEGER,
+    type: Sequelize.STRING,
     primaryKey: true,
     allowNull: false
   },
