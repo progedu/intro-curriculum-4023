@@ -1,4 +1,12 @@
 doctype html
+
+// facebookではURLに「#_=_」というハッシュが入ってしまうのを削除
+script(type="text/javascript").
+  if (window.location.hash == '#_=_') {
+      window.location = window.location.href.replace(/#.*/, '');
+      history.pushState();  //location.replace();  でも可
+  }
+
 html
   head
     title 予定調整くん

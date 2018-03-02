@@ -19,7 +19,19 @@ block content
       textarea(id="candidates" class="form-control" name="candidates")
     div
       button(class="btn btn-info" type="submit") 以上の内容で予定を編集する
+
   h3 危険な変更
   form(method="post", action="/schedules/#{schedule.scheduleId}?delete=1")
     input(type="hidden" name="_csrf" value!="#{csrfToken}")
     button(class="btn btn-danger" type="submit") この予定を削除する
+  br
+  label 候補日程を削除する  
+  div(class="form-group")
+    table(class="table-bordered")
+      each candidate in candidates
+        tr
+          th(class="list-group-item") #{candidate.candidateName}
+          td
+            form(method="post", action="candidates/#{candidate.candidateId}?candidatedelete=1")
+              input(type="hidden" name="_csrf" value!="#{csrfToken}")
+              button(class="btn btn-danger" type="submit") 削除

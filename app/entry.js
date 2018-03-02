@@ -43,3 +43,10 @@ buttonSelfComment.click(() => {
       });
   }
 });
+
+const clipboardButton = $('.clipboard');
+clipboardButton.click(() => {
+  const shareURL = $('#shareURL');
+  shareURL.select();
+  document.execCommand('copy');
+});

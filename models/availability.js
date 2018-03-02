@@ -2,6 +2,8 @@
 const loader = require('./sequelize-loader');
 const Sequelize = loader.Sequelize;
 
+//userId系は計算する必要はないので、INTEGER(またはBIGINT）ではなくSTRINGに
+//facebookのIDは桁数が大きすぎてINTEGERには入らない。
 const Availability = loader.database.define('availabilities', {
   candidateId: {
     type: Sequelize.INTEGER,
@@ -9,7 +11,7 @@ const Availability = loader.database.define('availabilities', {
     allowNull: false
   },
   userId: {
-    type: Sequelize.INTEGER,
+    type: Sequelize.STRING,
     primaryKey: true,
     allowNull: false
   },
