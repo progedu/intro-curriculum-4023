@@ -11,6 +11,7 @@ const Comment = require('../models/comment');
 const csrf = require('csurf');
 const csrfProtection = csrf({ cookie: true });
 
+
 router.get('/new', authenticationEnsurer, csrfProtection, (req, res, next) => {
   res.render('new', { user: req.user, csrfToken: req.csrfToken() });
 });
@@ -30,6 +31,7 @@ router.post('/', authenticationEnsurer, csrfProtection, (req, res, next) => {
 });
 
 router.get('/:scheduleId', authenticationEnsurer, (req, res, next) => {
+  var scheduleUrl = req.protocol + '://' + req.get('host') + req.originalUrl;
   let storedSchedule = null;
   let storedCandidates = null;
   Schedule.findOne({
@@ -45,6 +47,9 @@ router.get('/:scheduleId', authenticationEnsurer, (req, res, next) => {
   }).then((schedule) => {
     if (schedule) {
       storedSchedule = schedule;
+      console.log(storedSchedule.scheduleId + "@@@________@@@@@@@_______");
+      console.log(typeof (storedSchedule.scheduleId));
+      //countCandidateAttender(countCandidateAttender(storedSchedule.scheduleId));
       return Candidate.findAll({
         where: { scheduleId: schedule.scheduleId },
         order: '"candidateId" ASC'
@@ -110,13 +115,15 @@ router.get('/:scheduleId', authenticationEnsurer, (req, res, next) => {
       comments.forEach((comment) => {
         commentMap.set(comment.userId, comment.comment);
       });
+      countCandidateAttender(storedSchedule.scheduleId);
       res.render('schedule', {
         user: req.user,
         schedule: storedSchedule,
         candidates: storedCandidates,
         users: users,
         availabilityMapMap: availabilityMapMap,
-        commentMap: commentMap
+        commentMap: commentMap,
+        scheduleUrl: scheduleUrl
       });
     });
   });
@@ -226,20 +233,42 @@ function deleteScheduleAggregate(scheduleId, done, err) {
   });
 }
 
+function countCandidateAttender(scheduleId, err) {
+  Availability.findAll({
+    where: { scheduleId: scheduleId }
+  }).then((availabilities) => {
+    const countArray = availabilities.map((a) => { return [a.candidateId, a.availability] });//Map配列にしたい。
+    console.log(countArray)
+    console.log(countArray[0][0]);
+    
+    for (let i = 0; i < countArray.length; i ++){
+      console.log(countArray[i][1]);
+    }
+    return Promise.all(countArray);
+  }).then((countarray) => {
+    console.log(countarray + " @@@@@@@")
+  }).catch(function (error) {
+    console.error(error);
+  });
+}
+
 router.deleteScheduleAggregate = deleteScheduleAggregate;
 
 function createCandidatesAndRedirect(candidateNames, scheduleId, res) {
-    const candidates = candidateNames.map((c) => { return {
+  const candidates = candidateNames.map((c) => {
+    return {
       candidateName: c,
       scheduleId: scheduleId
-    };});
-    Candidate.bulkCreate(candidates).then(() => {
-          res.redirect('/schedules/' + scheduleId);
-    });
+    };
+  });
+  Candidate.bulkCreate(candidates).then(() => {
+    res.redirect('/schedules/' + scheduleId);
+  });
 }
 
 function parseCandidateNames(req) {
   return req.body.candidates.trim().split('\n').map((s) => s.trim());
 }
+
 
 module.exports = router;

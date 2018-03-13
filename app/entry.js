@@ -12,9 +12,11 @@ $('.availability-toggle-button').each((i, e) => {
     const candidateId = button.data('candidate-id');
     const availability = parseInt(button.data('availability'));
     const nextAvailability = (availability + 1) % 3;
+    const totalAttendee = $('p').data();
     $.post(`/schedules/${scheduleId}/users/${userId}/candidates/${candidateId}`,
       { availability: nextAvailability },
       (data) => {
+        
         button.data('availability', data.availability);
         const availabilityLabels = ['欠', '？', '出'];
         button.text(availabilityLabels[data.availability]);
@@ -27,6 +29,7 @@ $('.availability-toggle-button').each((i, e) => {
         button.parent().removeClass('bg-danger bg-default bg-success');
         button.parent().addClass(tdAvailabilityClasses[data.availability]);
       });
+      console.log(totalAttendee);
   });
 });
 
@@ -43,3 +46,4 @@ buttonSelfComment.click(() => {
       });
   }
 });
+
