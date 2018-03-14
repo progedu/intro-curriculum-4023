@@ -3,6 +3,8 @@ const express = require('express');
 const router = express.Router();
 const authenticationEnsurer = require('./authentication-ensurer');
 const uuid = require('node-uuid');
+const loader = require('../models/sequelize-loader');
+const sequelize = loader.database;
 const Schedule = require('../models/schedule');
 const Candidate = require('../models/candidate');
 const User = require('../models/user');
@@ -32,6 +34,10 @@ router.post('/', authenticationEnsurer, csrfProtection, (req, res, next) => {
 router.get('/:scheduleId', authenticationEnsurer, (req, res, next) => {
   let storedSchedule = null;
   let storedCandidates = null;
+  let users = null;
+  const availabilityMapMap = new Map();
+  const commentMap = new Map();
+
   Schedule.findOne({
     include: [
       {
@@ -69,7 +75,6 @@ router.get('/:scheduleId', authenticationEnsurer, (req, res, next) => {
     });
   }).then((availabilities) => {
     // 出欠 MapMap(キー:ユーザー ID, 値:出欠Map(キー:候補 ID, 値:出欠)) を作成する
-    const availabilityMapMap = new Map(); // key: userId, value: Map(key: candidateId, availability)
     availabilities.forEach((a) => {
       const map = availabilityMapMap.get(a.user.userId) || new Map();
       map.set(a.candidateId, a.availability);
@@ -92,7 +97,7 @@ router.get('/:scheduleId', authenticationEnsurer, (req, res, next) => {
     });
 
     // 全ユーザー、全候補で二重ループしてそれぞれの出欠の値がない場合には、「欠席」を設定する
-    const users = Array.from(userMap).map((keyValue) => keyValue[1]);
+    users = Array.from(userMap).map((keyValue) => keyValue[1]);
     users.forEach((u) => {
       storedCandidates.forEach((c) => {
         const map = availabilityMapMap.get(u.userId) || new Map();
@@ -105,19 +110,34 @@ router.get('/:scheduleId', authenticationEnsurer, (req, res, next) => {
     // コメント取得
     return Comment.findAll({
       where: { scheduleId: storedSchedule.scheduleId }
-    }).then((comments) => {
-      const commentMap = new Map();  // key: userId, value: comment
-      comments.forEach((comment) => {
-        commentMap.set(comment.userId, comment.comment);
-      });
-      res.render('schedule', {
-        user: req.user,
-        schedule: storedSchedule,
-        candidates: storedCandidates,
-        users: users,
-        availabilityMapMap: availabilityMapMap,
-        commentMap: commentMap
-      });
+    });
+  }).then((comments) => {
+    comments.forEach((comment) => {
+      commentMap.set(comment.userId, comment.comment);
+    });
+
+    //出席人数を取得
+    return Availability.findAll({
+      attributes: ['candidateId', [sequelize.fn('COUNT', sequelize.col('userId')), 'count']],
+      group: ['candidateId'],
+      where: { scheduleId: storedSchedule.scheduleId, availability: 2 }
+    });
+  }).then((attendances) => {
+    const attendanceMap = new Map(); // key: candidateId, value: 出席率
+    attendances.forEach((attendance) => {
+      const attendanceCount = attendance.dataValues['count'];
+      const attendanceRate = attendanceCount ? Math.round(attendanceCount / users.length * 100) : 0;
+      attendanceMap.set(attendance.candidateId, attendanceRate);
+    });
+
+    res.render('schedule', {
+      user: req.user,
+      schedule: storedSchedule,
+      candidates: storedCandidates,
+      users: users,
+      availabilityMapMap: availabilityMapMap,
+      commentMap: commentMap,
+      attendanceMap: attendanceMap
     });
   });
 });
@@ -229,13 +249,15 @@ function deleteScheduleAggregate(scheduleId, done, err) {
 router.deleteScheduleAggregate = deleteScheduleAggregate;
 
 function createCandidatesAndRedirect(candidateNames, scheduleId, res) {
-    const candidates = candidateNames.map((c) => { return {
+  const candidates = candidateNames.map((c) => {
+    return {
       candidateName: c,
       scheduleId: scheduleId
-    };});
-    Candidate.bulkCreate(candidates).then(() => {
-          res.redirect('/schedules/' + scheduleId);
-    });
+    };
+  });
+  Candidate.bulkCreate(candidates).then(() => {
+    res.redirect('/schedules/' + scheduleId);
+  });
 }
 
 function parseCandidateNames(req) {
