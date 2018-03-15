@@ -1,5 +1,7 @@
 'use strict';
 const express = require('express');
+const sequelize = require('sequelize');
+const Op = sequelize.Op;
 const router = express.Router();
 const authenticationEnsurer = require('./authentication-ensurer');
 const uuid = require('node-uuid');
@@ -9,7 +11,7 @@ const User = require('../models/user');
 const Availability = require('../models/availability');
 const Comment = require('../models/comment');
 const csrf = require('csurf');
-const csrfProtection = csrf({ cookie: true });
+const csrfProtection = csrf({ cookie: true });;
 
 
 router.get('/new', authenticationEnsurer, csrfProtection, (req, res, next) => {
@@ -235,18 +237,18 @@ function deleteScheduleAggregate(scheduleId, done, err) {
 
 function countCandidateAttender(scheduleId, err) {
   Availability.findAll({
-    where: { scheduleId: scheduleId }
-  }).then((availabilities) => {
-    const countArray = availabilities.map((a) => { return [a.candidateId, a.availability] });//Map配列にしたい。
-    console.log(countArray)
-    console.log(countArray[0][0]);
-    
-    for (let i = 0; i < countArray.length; i ++){
-      console.log(countArray[i][1]);
-    }
-    return Promise.all(countArray);
-  }).then((countarray) => {
-    console.log(countarray + " @@@@@@@")
+    where: { scheduleId: scheduleId, availability: 2 },
+    attributes: ['candidateId',
+      [sequelize.fn('COUNT', sequelize.col('availability')), 'cnt']
+    ],
+    group: ['availabilities.candidateId']
+  }).then((candidates) => {
+    console.log(candidates);
+    candidates.forEach((c) => {
+      let cnt = c.get('cnt');
+      console.log(c.candidateId + ' ' + cnt)
+    })
+    console.log(" @@@@@@@")
   }).catch(function (error) {
     console.error(error);
   });
