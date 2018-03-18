@@ -43,3 +43,13 @@ buttonSelfComment.click(() => {
       });
   }
 });
+
+const deleteCheck = $('#btn-delete');
+deleteCheck.click(() => {
+  const result = window.confirm('本当に削除して良いですか？');
+  if( result ) {
+    return true;
+  }else {
+    return false;
+  }
+});
