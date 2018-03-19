@@ -1,15 +1,31 @@
+//- layout.jadeを継承して
 extends layout
 
+//- contentブロックを書き換える
 block content
+  //- /schedulesにPOSTで入力データを渡す
   form(method="post", action="/schedules")
+    //- _csrfという名前のパラメータを与えることで
+    //- 'csurf'モジュールによるチェックを行うことができる
     input(type="hidden" name="_csrf" value!="#{csrfToken}")
+    //- formグループ
     div(class="form-group")
+      //- ラベル
       label(for="scheduleName") 予定名
-      input(id="scheduleName" class="form-control" type="text" name="scheduleName")
+      //- テキストボックス
+      input(id="scheduleName" class="form-control" type="text" name="scheduleName"  onKeyUp="check()")
+    //- 同上
     div(class="form-group")
       label(for="memo") メモ
       textarea(id="memo" class="form-control" name="memo")
+    //- 同上
     div(class="form-group")
       label(for="candidates") 候補日程 (改行して複数入力してください)
-      textarea(id="candidates" class="form-control" name="candidates")
-    button(class="btn btn-info" type="submit") 予定をつくる
+      textarea(id="candidates" class="form-control" name="candidates" onKeyUp="check()")
+    div(id="validate-text") 
+      ul
+        li 予定名を入力してください
+        li 候補日を１つ以上入力してください
+    //- ボタン
+    button(id="submit-button" class="btn btn-info" type="submit" disabled="disabled") 予定をつくる
+  script(src="/javascripts/validator.js")

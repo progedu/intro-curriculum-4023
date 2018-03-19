@@ -1,33 +1,59 @@
 extends layout
 
 block content
+  //- パネル
   div(class="panel panel-info")
+    //- パネルヘッダ
     div(class="panel-heading")
       h4 #{schedule.scheduleName}
+    //- パネルボディ
     div(class="panel-body")
       p(style="white-space:pre;") #{schedule.memo}
+    //- パネルフッター
     div(class="panel-footer")
       p 作成者: #{schedule.user.username}
+  //- スケジュールの作成者と閲覧ユーザーが同じなら
   - var isMine = parseInt(user.id) === schedule.user.userId
   if isMine
+    //- 編集ボタンを表示
     div
       a(class="btn btn-info" href="/schedules/#{schedule.scheduleId}/edit") この予定を編集する
   h3 出欠表
+  //- 表
   table(class="table table-bordered")
     tr
       th 予定
-      each user in users
+      each user in users        
         th #{user.username}
+    //- 候補日を行にする
     each candidate in candidates
       tr
+        //- 予定カラム
         th #{candidate.candidateName}
+        //- ユーザーごとにカラムを作る
         each user in users
+          //- 走査中ユーザーの出欠データ
           - var availability = availabilityMapMap.get(user.userId).get(candidate.candidateId)
+          //- ボタンに表示するラベル
           - var availabilityLabels = ['欠', '？', '出'];
+          //- 出欠に対応するbootstrapのボタンのクラス
           - var buttonStyles = ['btn-danger', 'btn-default', 'btn-success'];
+          //- 出欠に対応するbootstrapの背景のクラス          
           - var tdAvailabilityClasses = ['bg-danger', 'bg-default', 'bg-success'];
+          //- 出欠セルの背景色設定
           td(class="#{tdAvailabilityClasses[availability]}")
+            //- 自分自身の予定はボタンを表示し
             if user.isSelf
+              //- availability は 0が欠席、1が不明、2が出席を表す
+              //- button #{availabilityLabels[availability]}
+              //- data-XXXXXXはHTML の要素に独自のデータを保有させたい場合に利用する属性
+              //- こんな感じのHTMLが発行される
+              //- <button 
+              //- data-schedule-id="81106aa9-4c17-47c5-af0f-8abce6303e7a"
+              //- data-user-id="16929852"
+              //- data-candidate-id="44"
+              //- data-availability="0"
+              //- class="availability-toggle-button">欠</button>
               button(class="availability-toggle-button btn-lg #{buttonStyles[availability]}"
                 data-schedule-id="#{schedule.scheduleId}"
                 data-user-id="#{user.userId}"
@@ -36,10 +62,14 @@ block content
             else
               h3 #{availabilityLabels[availability]}
     tr
+      //- コメント表示
       th コメント
+      //- ユーザーごとにコメントを表示する
       each user in users
+        //- 閲覧中ユーザー自身のコメントは編集できるようにする
         if user.isSelf
           td
+            //- コメントは各ユーザー１つなのでidを使っている
             p
               small(id="self-comment") #{commentMap.get(user.userId)}
             button(class="btn-xs btn-info"
@@ -48,5 +78,4 @@ block content
               data-user-id="#{user.userId}") 編集
         else
           td
-            p
-              small #{commentMap.get(user.userId)}
+            p #{commentMap.get(user.userId)}

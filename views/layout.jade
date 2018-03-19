@@ -8,17 +8,26 @@ html
     link(rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous")
     link(rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap-theme.min.css" integrity="sha384-fLW2N01lMqjakBkx3l/M9EahuwpSfeNvV63J5ezn3uZzapT0u7EYsXMjQV+0En5r" crossorigin="anonymous")
   body
+    //- ナビゲーションバー
     nav(class="navbar navbar-default")
+      //- ナビゲーションバーヘッダー（左上）
       div(class="navbar-header")
+        //- サイトのタイトル（トップへリンク）
         a(class="navbar-brand" href="/") 予定調整くん
+      //- 全幅のcontainerを使用
       div(class="container-fluid")
+        //- ナビゲーションを右上に置く
         ul(class="nav navbar-nav navbar-right")
           if user
             li
-              a(href="/logout") #{user.username} をログアウト
+              a(href="/logout")
+                button(class="btn btn-success") #{user.username} をログアウト
           else
             li
-              a(href="/login") ログイン
+              a(href="/auth/github")
+                button(class="btn btn-info") GitHubでログイン
     div(class="container")
       block content
+    //- webpackでバンドルされたクライアントサイドの
+    //- JavaScript読み込み
     script(src="/javascripts/bundle.js")
