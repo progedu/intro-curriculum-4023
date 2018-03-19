@@ -117,7 +117,23 @@ router.get('/:scheduleId', authenticationEnsurer, (req, res, next) => {
       comments.forEach((comment) => {
         commentMap.set(comment.userId, comment.comment);
       });
-      countCandidateAttender(storedSchedule.scheduleId);
+
+      const attendersNumMap = new Map();
+      Availability.findAll({
+        where: { scheduleId: storedSchedule.scheduleId, availability: 2 },
+        attributes: ['candidateId',
+          [sequelize.fn('COUNT',
+            sequelize.col('availability')),
+            'cnt']],
+        group: ['availabilities.candidateId']
+      }).then((candidates) => {
+        candidates.forEach((c) => {
+          const cnt = c.get('cnt');
+          attendersNumMap.set(c.candidateId, cnt);
+        });
+        console.log(attendersNumMap);
+      });
+
       res.render('schedule', {
         user: req.user,
         schedule: storedSchedule,
@@ -125,7 +141,8 @@ router.get('/:scheduleId', authenticationEnsurer, (req, res, next) => {
         users: users,
         availabilityMapMap: availabilityMapMap,
         commentMap: commentMap,
-        scheduleUrl: scheduleUrl
+        scheduleUrl: scheduleUrl,
+        attendersNumMap: attendersNumMap
       });
     });
   });
@@ -246,9 +263,9 @@ function countCandidateAttender(scheduleId, err) {
     console.log(candidates);
     candidates.forEach((c) => {
       let cnt = c.get('cnt');
+
       console.log(c.candidateId + ' ' + cnt)
     })
-    console.log(" @@@@@@@")
   }).catch(function (error) {
     console.error(error);
   });
