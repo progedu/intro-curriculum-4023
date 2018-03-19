@@ -1,12 +1,16 @@
+//- layoutを継承して
 extends layout
-
+//- contentブロックを書き換える
 block content
+  //- 見出し用のアレ
   div(class="jumbotron")
     h1 予定調整くん
     p 予定調整くんは、GitHubで認証でき、予定を作って出欠が取れるサービスです
   if user
     div
+      //- ボタン
       a(class="btn btn-info" href="/schedules/new") 予定を作る
+    //- スケジュールが存在するなら表示する
     - var hasSchedule = schedules.length > 0
     if hasSchedule
       h3 あなたの作った予定一覧
