@@ -15,14 +15,14 @@ block content
   table(class="table table-bordered")
     tr
       th 予定
-      th 出席者数
+      th 参加者数
       each user in users
         th #{user.username}
     each candidate in candidates
+      -var attendersNum = attendersNumMap.get(candidate.candidateId);
       tr
         th #{candidate.candidateName}
-        td ｘ人 
-        //#{attendersSum.candidate.candidateId}
+        td(style="font-weight:bolder;",id="#{candidate.candidateId}",data-attenders-num="#{attendersNum}") #{attendersNum}
         each user in users
           - var availability = availabilityMapMap.get(user.userId).get(candidate.candidateId)
           - var availabilityLabels = ['欠', '？', '出'];

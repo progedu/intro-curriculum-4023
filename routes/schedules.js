@@ -49,9 +49,6 @@ router.get('/:scheduleId', authenticationEnsurer, (req, res, next) => {
   }).then((schedule) => {
     if (schedule) {
       storedSchedule = schedule;
-      console.log(storedSchedule.scheduleId + "@@@________@@@@@@@_______");
-      console.log(typeof (storedSchedule.scheduleId));
-      //countCandidateAttender(countCandidateAttender(storedSchedule.scheduleId));
       return Candidate.findAll({
         where: { scheduleId: schedule.scheduleId },
         order: '"candidateId" ASC'
@@ -131,18 +128,18 @@ router.get('/:scheduleId', authenticationEnsurer, (req, res, next) => {
           const cnt = c.get('cnt');
           attendersNumMap.set(c.candidateId, cnt);
         });
-        console.log(attendersNumMap);
-      });
 
-      res.render('schedule', {
-        user: req.user,
-        schedule: storedSchedule,
-        candidates: storedCandidates,
-        users: users,
-        availabilityMapMap: availabilityMapMap,
-        commentMap: commentMap,
-        scheduleUrl: scheduleUrl,
-        attendersNumMap: attendersNumMap
+        
+        res.render('schedule', {
+          user: req.user,
+          schedule: storedSchedule,
+          candidates: storedCandidates,
+          users: users,
+          availabilityMapMap: availabilityMapMap,
+          commentMap: commentMap,
+          scheduleUrl: scheduleUrl,
+          attendersNumMap: attendersNumMap
+        });
       });
     });
   });
@@ -249,25 +246,6 @@ function deleteScheduleAggregate(scheduleId, done, err) {
   }).then(() => {
     if (err) return done(err);
     done();
-  });
-}
-
-function countCandidateAttender(scheduleId, err) {
-  Availability.findAll({
-    where: { scheduleId: scheduleId, availability: 2 },
-    attributes: ['candidateId',
-      [sequelize.fn('COUNT', sequelize.col('availability')), 'cnt']
-    ],
-    group: ['availabilities.candidateId']
-  }).then((candidates) => {
-    console.log(candidates);
-    candidates.forEach((c) => {
-      let cnt = c.get('cnt');
-
-      console.log(c.candidateId + ' ' + cnt)
-    })
-  }).catch(function (error) {
-    console.error(error);
   });
 }
 

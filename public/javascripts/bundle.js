@@ -10474,7 +10474,12 @@ $('.availability-toggle-button').each((i, e) => {
     const candidateId = button.data('candidate-id');
     const availability = parseInt(button.data('availability'));
     const nextAvailability = (availability + 1) % 3;
-    const totalAttendee = $('p').data();
+   
+    const attendersNum = $('#'+candidateId);
+    const nowAttendersNum = parseInt(attendersNum.data('attenders-num'));
+    const nextAttendersNum = nowAttendersNum + nextAvailability - 1;
+    
+    console.log("fff" + nextAttendersNum);
     $.post(`/schedules/${scheduleId}/users/${userId}/candidates/${candidateId}`,
       { availability: nextAvailability },
       (data) => {
@@ -10490,8 +10495,10 @@ $('.availability-toggle-button').each((i, e) => {
         const tdAvailabilityClasses = ['bg-danger', 'bg-default', 'bg-success'];
         button.parent().removeClass('bg-danger bg-default bg-success');
         button.parent().addClass(tdAvailabilityClasses[data.availability]);
+
+        attendersNum.data('attenders-num',nextAttendersNum);
+        attendersNum.text(nextAttendersNum);
       });
-      console.log(totalAttendee);
   });
 });
 
