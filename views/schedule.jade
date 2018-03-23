@@ -1,5 +1,4 @@
 extends layout
-
 block content
   div(class="panel panel-info")
     div(class="panel-heading")
@@ -16,11 +15,14 @@ block content
   table(class="table table-bordered")
     tr
       th 予定
+      th 参加者数
       each user in users
         th #{user.username}
     each candidate in candidates
+      -var attendersNum = attendersNumMap.get(candidate.candidateId);
       tr
         th #{candidate.candidateName}
+        td(style="font-weight:bolder;",id="#{candidate.candidateId}",data-attenders-num="#{attendersNum}") #{attendersNum}
         each user in users
           - var availability = availabilityMapMap.get(user.userId).get(candidate.candidateId)
           - var availabilityLabels = ['欠', '？', '出'];
@@ -50,3 +52,17 @@ block content
           td
             p
               small #{commentMap.get(user.userId)}
+  
+  h3 このスケジュールへのリンク
+  div(class='input-group')
+    label(class="input-group-btn")
+      span(class="btn btn-primary" onclick="copyToClipboard()")
+        i(class="glyphicon glyphicon-copy")
+    input(class="form-control" id="copyTarget" type="text"  value='#{scheduleUrl}')
+      
+  script(type='text/javascript').
+    function copyToClipboard() {
+    var copyTarget = document.getElementById("copyTarget");
+    copyTarget.select();
+    document.execCommand("Copy")}
+  

@@ -1,5 +1,7 @@
 'use strict';
 const express = require('express');
+const sequelize = require('sequelize');
+const Op = sequelize.Op;
 const router = express.Router();
 const authenticationEnsurer = require('./authentication-ensurer');
 const uuid = require('node-uuid');
@@ -9,7 +11,8 @@ const User = require('../models/user');
 const Availability = require('../models/availability');
 const Comment = require('../models/comment');
 const csrf = require('csurf');
-const csrfProtection = csrf({ cookie: true });
+const csrfProtection = csrf({ cookie: true });;
+
 
 router.get('/new', authenticationEnsurer, csrfProtection, (req, res, next) => {
   res.render('new', { user: req.user, csrfToken: req.csrfToken() });
@@ -20,7 +23,7 @@ router.post('/', authenticationEnsurer, csrfProtection, (req, res, next) => {
   const updatedAt = new Date();
   Schedule.create({
     scheduleId: scheduleId,
-    scheduleName: req.body.scheduleName.slice(0, 255),
+    scheduleName: req.body.scheduleName.slice(0,255),
     memo: req.body.memo,
     createdBy: req.user.id,
     updatedAt: updatedAt
@@ -30,6 +33,7 @@ router.post('/', authenticationEnsurer, csrfProtection, (req, res, next) => {
 });
 
 router.get('/:scheduleId', authenticationEnsurer, (req, res, next) => {
+  var scheduleUrl = req.protocol + '://' + req.get('host') + req.originalUrl;
   let storedSchedule = null;
   let storedCandidates = null;
   Schedule.findOne({
@@ -110,13 +114,32 @@ router.get('/:scheduleId', authenticationEnsurer, (req, res, next) => {
       comments.forEach((comment) => {
         commentMap.set(comment.userId, comment.comment);
       });
-      res.render('schedule', {
-        user: req.user,
-        schedule: storedSchedule,
-        candidates: storedCandidates,
-        users: users,
-        availabilityMapMap: availabilityMapMap,
-        commentMap: commentMap
+
+      const attendersNumMap = new Map();
+      Availability.findAll({
+        where: { scheduleId: storedSchedule.scheduleId, availability: 2 },
+        attributes: ['candidateId',
+          [sequelize.fn('COUNT',
+            sequelize.col('availability')),
+            'cnt']],
+        group: ['availabilities.candidateId']
+      }).then((candidates) => {
+        candidates.forEach((c) => {
+          const cnt = c.get('cnt');
+          attendersNumMap.set(c.candidateId, cnt);
+        });
+
+        
+        res.render('schedule', {
+          user: req.user,
+          schedule: storedSchedule,
+          candidates: storedCandidates,
+          users: users,
+          availabilityMapMap: availabilityMapMap,
+          commentMap: commentMap,
+          scheduleUrl: scheduleUrl,
+          attendersNumMap: attendersNumMap
+        });
       });
     });
   });
@@ -229,17 +252,20 @@ function deleteScheduleAggregate(scheduleId, done, err) {
 router.deleteScheduleAggregate = deleteScheduleAggregate;
 
 function createCandidatesAndRedirect(candidateNames, scheduleId, res) {
-    const candidates = candidateNames.map((c) => { return {
+  const candidates = candidateNames.map((c) => {
+    return {
       candidateName: c,
       scheduleId: scheduleId
-    };});
-    Candidate.bulkCreate(candidates).then(() => {
-          res.redirect('/schedules/' + scheduleId);
-    });
+    };
+  });
+  Candidate.bulkCreate(candidates).then(() => {
+    res.redirect('/schedules/' + scheduleId);
+  });
 }
 
 function parseCandidateNames(req) {
   return req.body.candidates.trim().split('\n').map((s) => s.trim());
 }
+
 
 module.exports = router;
