@@ -14,7 +14,7 @@ $('.availability-toggle-button').each((i, e) => {
     const nextAvailability = (availability + 1) % 3;
    
     const attendersNum = $('#'+candidateId);
-    const nowAttendersNum = parseInt(attendersNum.data('attenders-num'));
+    const nowAttendersNum = parseInt(attendersNum.data('attenders-num')) || 0;
     const nextAttendersNum = nowAttendersNum + nextAvailability - 1;
     
     console.log("fff" + nextAttendersNum);
@@ -53,4 +53,3 @@ buttonSelfComment.click(() => {
       });
   }
 });
-

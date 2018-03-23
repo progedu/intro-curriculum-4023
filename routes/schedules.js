@@ -23,7 +23,7 @@ router.post('/', authenticationEnsurer, csrfProtection, (req, res, next) => {
   const updatedAt = new Date();
   Schedule.create({
     scheduleId: scheduleId,
-    scheduleName: req.body.scheduleName.slice(0, 255),
+    scheduleName: req.body.scheduleName.slice(0,255),
     memo: req.body.memo,
     createdBy: req.user.id,
     updatedAt: updatedAt
