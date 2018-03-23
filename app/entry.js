@@ -17,7 +17,6 @@ $('.availability-toggle-button').each((i, e) => {
     const nowAttendersNum = parseInt(attendersNum.data('attenders-num')) || 0;
     const nextAttendersNum = nowAttendersNum + nextAvailability - 1;
     
-    console.log("fff" + nextAttendersNum);
     $.post(`/schedules/${scheduleId}/users/${userId}/candidates/${candidateId}`,
       { availability: nextAvailability },
       (data) => {
