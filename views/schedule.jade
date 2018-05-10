@@ -18,7 +18,10 @@ block content
       th 予定
       each user in users
         th #{user.username}
+    - var priorityNum = [0]; //出席者数
+    - var candidatesCount = 0; //候補の番号
     each candidate in candidates
+      - priorityNum[candidatesCount] = 0; //出席者数を初期化
       tr
         th #{candidate.candidateName}
         each user in users
@@ -26,6 +29,9 @@ block content
           - var availabilityLabels = ['欠', '？', '出'];
           - var buttonStyles = ['btn-danger', 'btn-default', 'btn-success'];
           - var tdAvailabilityClasses = ['bg-danger', 'bg-default', 'bg-success'];
+
+          - priorityNum[candidatesCount] += availability === 2 ? 1 : 0; // 出席者数を記録
+
           td(class="#{tdAvailabilityClasses[availability]}")
             if user.isSelf
               button(class="availability-toggle-button btn-lg #{buttonStyles[availability]}"
@@ -35,8 +41,10 @@ block content
                 data-availability="#{availability}") #{availabilityLabels[availability]}
             else
               h3 #{availabilityLabels[availability]}
+      th 出席者予定者数 => #{priorityNum[candidatesCount]}
+      - candidatesCount++;
     tr
-      th コメント
+      th コメント 
       each user in users
         if user.isSelf
           td
