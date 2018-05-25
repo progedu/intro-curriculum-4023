@@ -8,6 +8,9 @@ block content
       p(style="white-space:pre;") #{schedule.memo}
     div(class="panel-footer")
       p 作成者: #{schedule.user.username}
+  div(class="form-group")
+    label(for="shareURL") 共有用 URL:
+    input(id="shareURL" class="form-control" type="text" value="http://localhost:8000/schedules/#{schedule.scheduleId}/")
   - var isMine = parseInt(user.id) === schedule.user.userId
   if isMine
     div
