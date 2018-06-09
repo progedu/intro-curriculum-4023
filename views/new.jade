@@ -5,11 +5,11 @@ block content
     input(type="hidden" name="_csrf" value!="#{csrfToken}")
     div(class="form-group")
       label(for="scheduleName") 予定名
-      input(id="scheduleName" class="form-control" type="text" name="scheduleName")
+      input(id="scheduleName" class="form-control" type="text" name="scheduleName" placeholder="例）ラーメンを食べる会")
     div(class="form-group")
       label(for="memo") メモ
-      textarea(id="memo" class="form-control" name="memo")
+      textarea(id="memo" class="form-control" name="memo" placeholder="例）会場などを記入してください。")
     div(class="form-group")
       label(for="candidates") 候補日程 (改行して複数入力してください)
-      textarea(id="candidates" class="form-control" name="candidates")
+      textarea(id="candidates" style="height:100 px" class="form-control"  name="candidates" placeholder="例）★改行して複数入力★\n20●●年●●月●●日\n20XX年XX月XX日\n20▲▲年▲▲月▲▲日")
     button(class="btn btn-info" type="submit") 予定をつくる
