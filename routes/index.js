@@ -2,6 +2,7 @@
 const express = require('express');
 const router = express.Router();
 const Schedule = require('../models/schedule');
+const Candidate = require('../models/candidate');
 const moment = require('moment-timezone');
 
 /* GET home page. */

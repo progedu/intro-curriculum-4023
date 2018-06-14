@@ -18,6 +18,7 @@ router.get('/new', authenticationEnsurer, csrfProtection, (req, res, next) => {
 router.post('/', authenticationEnsurer, csrfProtection, (req, res, next) => {
   const scheduleId = uuid.v4();
   const updatedAt = new Date();
+  if (req.body.scheduleName) {
   Schedule.create({
     scheduleId: scheduleId,
     scheduleName: req.body.scheduleName.slice(0, 255),
@@ -27,6 +28,11 @@ router.post('/', authenticationEnsurer, csrfProtection, (req, res, next) => {
   }).then((schedule) => {
     createCandidatesAndRedirect(parseCandidateNames(req), scheduleId, res);
   });
+  } else {
+    const err = new Error('予定名は必ず入力してください');
+      err.status = 404;
+      next(err);
+  }
 });
 
 router.get('/:scheduleId', authenticationEnsurer, (req, res, next) => {
