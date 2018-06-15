@@ -11,7 +11,7 @@ block content
     if hasSchedule
       h3.my-3 あなたの作った予定一覧
       table.table
-        tr
+        tr.active
           th 予定名
           th 更新日時
         each schedule in schedules
@@ -19,3 +19,15 @@ block content
             td
               a(href=`/schedules/${schedule.scheduleId}`) #{schedule.scheduleName}
             td #{schedule.formattedUpdatedAt}
+      h3.my-3 みんなの予定（最新５件）
+      table.table
+        tr
+          th 予定名
+          th 作成者
+          th 更新日時
+        each otherSchedule in otherSchedules
+          tr
+            td
+              a(href=`/schedules/${otherSchedule.scheduleId}`) #{otherSchedule.scheduleName}
+            td #{otherSchedule.user.username}
+            td #{otherSchedule.formattedUpdatedAt}
