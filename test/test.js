@@ -25,7 +25,7 @@ describe('/login', () => {
     request(app)
       .get('/login')
       .expect('Content-Type', 'text/html; charset=utf-8')
-      .expect(/<a href="\/auth\/github"/)
+      .expect(/GitHubでログイン/)
       .expect(200, done);
   });
 
