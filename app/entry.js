@@ -7,6 +7,7 @@ import bootstrap from 'bootstrap';
 $('.availability-toggle-button').each((i, e) => {
   const button = $(e);
   button.click(() => {
+    button.prop('disabled', true);
     const scheduleId = button.data('schedule-id');
     const userId = button.data('user-id');
     const candidateId = button.data('candidate-id');
@@ -22,6 +23,7 @@ $('.availability-toggle-button').each((i, e) => {
         const buttonStyles = ['btn-danger', 'btn-default', 'btn-success'];
         button.removeClass('btn-danger btn-default btn-success');
         button.addClass(buttonStyles[data.availability]);
+        button.prop('disabled', false);
       });
   });
 });

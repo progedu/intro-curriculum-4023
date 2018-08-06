@@ -239,7 +239,12 @@ function createCandidatesAndRedirect(candidateNames, scheduleId, res) {
 }
 
 function parseCandidateNames(req) {
-  return req.body.candidates.trim().split('\n').map((s) => s.trim());
+  return req.body.candidates.trim().split('\n').map((s) => {
+    return s.trim();
+  // 空行、重複を削除
+  }).filter(Boolean).filter((value, index, array) => {
+    return array.indexOf(value) === index;
+  });
 }
 
 module.exports = router;

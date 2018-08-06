@@ -53,6 +53,7 @@
 	$('.availability-toggle-button').each((i, e) => {
 	  let button = $(e);
 	  button.click(() => {
+			button.prop('disabled', true);
 	    let scheduleId = button.data('schedule-id');
 	    let userId = button.data('user-id');
 	    let candidateId = button.data('candidate-id');
@@ -67,7 +68,8 @@
 
 	        const buttonStyles = ['btn-danger', 'btn-default', 'btn-success'];
 	        button.removeClass('btn-danger btn-default btn-success');
-	        button.addClass(buttonStyles[data.availability]);
+					button.addClass(buttonStyles[data.availability]);
+					button.prop('disabled', false);
 	      });
 	  });
 	});
