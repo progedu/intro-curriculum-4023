@@ -57,7 +57,7 @@ describe('/schedules', () => {
     passportStub.uninstall(app);
   });
 
-  it('予定が作成でき、表示される', (done) => {
+  it('予定が作成でき、表示される（重複、空行は除外）', (done) => {
     User.upsert({ userId: 0, username: 'testuser' }).then(() => {
       request(app)
         .get('/schedules/new')
@@ -68,7 +68,7 @@ describe('/schedules', () => {
           request(app)
             .post('/schedules')
             .set('cookie', res.headers['set-cookie'])
-            .send({ scheduleName: 'テスト予定1', memo: 'テストメモ1\r\nテストメモ2', candidates: 'テスト候補1\r\nテスト候補2\r\nテスト候補3', _csrf: csrf })
+            .send({ scheduleName: 'テスト予定1', memo: 'テストメモ1\r\nテストメモ2', candidates: 'テスト候補1\r\n\r\n\r\n\r\nテスト候補1\r\nテスト候補1\r\nテスト候補2\r\nテスト候補3', _csrf: csrf })
             .expect('Location', /schedules/)
             .expect(302)
             .end((err, res) => {
