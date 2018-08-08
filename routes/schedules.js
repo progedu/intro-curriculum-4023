@@ -168,6 +168,7 @@ router.post('/:scheduleId', authenticationEnsurer, csrfProtection, (req, res, ne
           createdBy: req.user.id,
           updatedAt: updatedAt
         }).then((schedule) => {
+          res.redirect('/schedules/' + schedule.scheduleId);
           Candidate.findAll({
             where: { scheduleId: schedule.scheduleId },
             order: '"candidateId" ASC'
@@ -229,13 +230,33 @@ function deleteScheduleAggregate(scheduleId, done, err) {
 router.deleteScheduleAggregate = deleteScheduleAggregate;
 
 function createCandidatesAndRedirect(candidateNames, scheduleId, res) {
-    const candidates = candidateNames.map((c) => { return {
+
+  // 重複候補名の配列を作製
+  Candidate.findAll({
+    where: { scheduleId: scheduleId }
+  }).then((candidates) => {
+    let duplicatedCandidateNames = [];
+    candidates.forEach((candidate) => {
+      if (candidateNames.indexOf(candidate.candidateName) > -1) {
+        duplicatedCandidateNames.push(candidate.candidateName);
+      }
+    });
+
+    // 差分をとる
+    const deduplicatedCandidateNames = candidateNames.concat(duplicatedCandidateNames)
+     .filter((value) => {
+       return !candidateNames.includes(value) || !duplicatedCandidateNames.includes(value);
+    }).map((c) => { return {
       candidateName: c,
       scheduleId: scheduleId
     };});
-    Candidate.bulkCreate(candidates).then(() => {
+
+    Candidate.bulkCreate(deduplicatedCandidateNames).then(() => {
           res.redirect('/schedules/' + scheduleId);
     });
+
+  });
+
 }
 
 function parseCandidateNames(req) {
