@@ -246,7 +246,7 @@ function createCandidatesAndRedirect(candidateNames, scheduleId, res) {
     const deduplicatedCandidateNames = candidateNames.concat(duplicatedCandidateNames)
      .filter((value) => {
        return !candidateNames.includes(value) || !duplicatedCandidateNames.includes(value);
-    }).map((c) => { return {
+    }).filter(Boolean).map((c) => { return {
       candidateName: c,
       scheduleId: scheduleId
     };});
