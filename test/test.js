@@ -25,7 +25,7 @@ describe('/login', () => {
     request(app)
       .get('/login')
       .expect('Content-Type', 'text/html; charset=utf-8')
-      .expect(/GitHubでログイン/)
+      .expect(/<a class="btn btn-info my-3" href="\/auth\/github">GitHubでログイン<\/a>/)
       .expect(200, done);
   });
 
@@ -75,12 +75,7 @@ describe('/schedules', () => {
               const createdSchedulePath = res.headers.location;
               request(app)
                 .get(createdSchedulePath)
-                .expect(/テスト予定1/)
-                .expect(/テストメモ1/)
-                .expect(/テストメモ2/)
-                .expect(/テスト候補1/)
-                .expect(/テスト候補2/)
-                .expect(/テスト候補3/)
+                .expect(/<tr><th>テスト候補1<\/th><td><button class="availability-toggle-button btn btn-lg btn-danger" data-schedule-id="[a-z0-9\-]{36}" data-user-id="0" data-candidate-id="\d+" data-availability="0">欠<\/button><\/td><\/tr><tr><th>テスト候補2<\/th><td><button class="availability-toggle-button btn btn-lg btn-danger" data-schedule-id="[a-z0-9\-]{36}" data-user-id="0" data-candidate-id="\d+" data-availability="0">欠<\/button><\/td><\/tr><tr><th>テスト候補3<\/th><td><button class="availability-toggle-button btn btn-lg btn-danger" data-schedule-id="[a-z0-9\-]{36}" data-user-id="0" data-candidate-id="\d+" data-availability="0">欠<\/button><\/td><\/tr>/)
                 .expect(200)
                 .end((err, res) => { deleteScheduleAggregate(createdSchedulePath.split('/schedules/')[1], done, err); });
             });
