@@ -194,7 +194,7 @@ describe('/schedules/:scheduleId?edit=1', () => {
     passportStub.uninstall(app);
   });
 
-  it('予定が更新でき、候補が追加できる', (done) => {
+  it('予定が更新でき、候補が追加できる（重複(既存候補とも)、空行は除外）', (done) => {
     User.upsert({ userId: 0, username: 'testuser' }).then(() => {
       request(app)
         .get('/schedules/new')
@@ -213,7 +213,7 @@ describe('/schedules/:scheduleId?edit=1', () => {
               request(app)
                 .post(`/schedules/${scheduleId}?edit=1`)
                 .set('cookie', setCookie)
-                .send({ scheduleName: 'テスト更新予定2', memo: 'テスト更新メモ2', candidates: 'めもめも\n3', _csrf: csrf })
+                .send({ scheduleName: 'テスト更新予定2', memo: 'テスト更新メモ2', candidates: 'めもめも\nテスト更新候補1\n\n\n\nめもめも\n3', _csrf: csrf })
                 .end((err, res) => {
                   Schedule.findById(scheduleId).then((s) => {
                     assert.equal(s.scheduleName, 'テスト更新予定2');
