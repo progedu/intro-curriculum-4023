@@ -231,11 +231,11 @@ router.deleteScheduleAggregate = deleteScheduleAggregate;
 
 function createCandidatesAndRedirect(candidateNames, scheduleId, res) {
 
-  // 重複候補名の配列を作製
+  // 重複候補名の配列をつくる
+  let duplicatedCandidateNames = [];
   Candidate.findAll({
     where: { scheduleId: scheduleId }
   }).then((candidates) => {
-    let duplicatedCandidateNames = [];
     candidates.forEach((candidate) => {
       if (candidateNames.indexOf(candidate.candidateName) > -1) {
         duplicatedCandidateNames.push(candidate.candidateName);
@@ -243,7 +243,7 @@ function createCandidatesAndRedirect(candidateNames, scheduleId, res) {
     });
 
     // 差分をとる
-    const deduplicatedCandidateNames = candidateNames.concat(duplicatedCandidateNames)
+    const deduplicatedCandidates = candidateNames.concat(duplicatedCandidateNames)
      .filter((value) => {
        return !candidateNames.includes(value) || !duplicatedCandidateNames.includes(value);
     }).filter(Boolean).map((c) => { return {
@@ -251,7 +251,7 @@ function createCandidatesAndRedirect(candidateNames, scheduleId, res) {
       scheduleId: scheduleId
     };});
 
-    Candidate.bulkCreate(deduplicatedCandidateNames).then(() => {
+    Candidate.bulkCreate(deduplicatedCandidates).then(() => {
           res.redirect('/schedules/' + scheduleId);
     });
 

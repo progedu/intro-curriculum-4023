@@ -25,7 +25,7 @@ describe('/login', () => {
     request(app)
       .get('/login')
       .expect('Content-Type', 'text/html; charset=utf-8')
-      .expect(/<a class="btn btn-info my-3" href="\/auth\/github">GitHubでログイン<\/a>/)
+      .expect(/<a .*?href="\/auth\/github">GitHubでログイン<\/a>/)
       .expect(200, done);
   });
 
@@ -75,7 +75,8 @@ describe('/schedules', () => {
               const createdSchedulePath = res.headers.location;
               request(app)
                 .get(createdSchedulePath)
-                .expect(/<tr><th>テスト候補1<\/th><td><button class="availability-toggle-button btn btn-lg btn-danger" data-schedule-id="[a-z0-9\-]{36}" data-user-id="0" data-candidate-id="\d+" data-availability="0">欠<\/button><\/td><\/tr><tr><th>テスト候補2<\/th><td><button class="availability-toggle-button btn btn-lg btn-danger" data-schedule-id="[a-z0-9\-]{36}" data-user-id="0" data-candidate-id="\d+" data-availability="0">欠<\/button><\/td><\/tr><tr><th>テスト候補3<\/th><td><button class="availability-toggle-button btn btn-lg btn-danger" data-schedule-id="[a-z0-9\-]{36}" data-user-id="0" data-candidate-id="\d+" data-availability="0">欠<\/button><\/td><\/tr>/)
+                // つらい正規表現
+                .expect(/<tr><th>テスト候補1<\/th><td><button.*?>欠<\/button><\/td><\/tr><tr><th>テスト候補2<\/th><td><button.*?>欠<\/button><\/td><\/tr><tr><th>テスト候補3<\/th><td><button.*?>欠<\/button><\/td><\/tr><tr>/)
                 .expect(200)
                 .end((err, res) => { deleteScheduleAggregate(createdSchedulePath.split('/schedules/')[1], done, err); });
             });
@@ -208,7 +209,7 @@ describe('/schedules/:scheduleId?edit=1', () => {
               request(app)
                 .post(`/schedules/${scheduleId}?edit=1`)
                 .set('cookie', setCookie)
-                .send({ scheduleName: 'テスト更新予定2', memo: 'テスト更新メモ2', candidates: 'テスト更新候補2', _csrf: csrf })
+                .send({ scheduleName: 'テスト更新予定2', memo: 'テスト更新メモ2', candidates: '\nテスト更新候補1\n\nめもめも\n3', _csrf: csrf })
                 .end((err, res) => {
                   Schedule.findById(scheduleId).then((s) => {
                     assert.equal(s.scheduleName, 'テスト更新予定2');
@@ -217,9 +218,10 @@ describe('/schedules/:scheduleId?edit=1', () => {
                   Candidate.findAll({
                     where: { scheduleId: scheduleId }
                   }).then((candidates) => {
-                    assert.equal(candidates.length, 2);
+                    assert.equal(candidates.length, 3);
                     assert.equal(candidates[0].candidateName, 'テスト更新候補1');
-                    assert.equal(candidates[1].candidateName, 'テスト更新候補2');
+                    assert.equal(candidates[1].candidateName, 'めもめも');
+                    assert.equal(candidates[2].candidateName, '3');
                     deleteScheduleAggregate(scheduleId, done, err);
                   });
                 });
