@@ -168,7 +168,6 @@ router.post('/:scheduleId', authenticationEnsurer, csrfProtection, (req, res, ne
           createdBy: req.user.id,
           updatedAt: updatedAt
         }).then((schedule) => {
-          res.redirect('/schedules/' + schedule.scheduleId);
           Candidate.findAll({
             where: { scheduleId: schedule.scheduleId },
             order: '"candidateId" ASC'

@@ -213,7 +213,7 @@ describe('/schedules/:scheduleId?edit=1', () => {
               request(app)
                 .post(`/schedules/${scheduleId}?edit=1`)
                 .set('cookie', setCookie)
-                .send({ scheduleName: 'テスト更新予定2', memo: 'テスト更新メモ2', candidates: '\nテスト更新候補1\n\nめもめも\n3', _csrf: csrf })
+                .send({ scheduleName: 'テスト更新予定2', memo: 'テスト更新メモ2', candidates: 'めもめも\n3', _csrf: csrf })
                 .end((err, res) => {
                   Schedule.findById(scheduleId).then((s) => {
                     assert.equal(s.scheduleName, 'テスト更新予定2');
