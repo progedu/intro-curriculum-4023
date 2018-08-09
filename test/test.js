@@ -73,10 +73,14 @@ describe('/schedules', () => {
             .expect(302)
             .end((err, res) => {
               const createdSchedulePath = res.headers.location;
+              const regex1 = '<tr><th>テスト候補1<\/th><td><button.*?>欠<\/button><\/td><\/tr>';
+              const regex2 = '<tr><th>テスト候補2<\/th><td><button.*?>欠<\/button><\/td><\/tr>';
+              const regex3 = '<tr><th>テスト候補3<\/th><td><button.*?>欠<\/button><\/td><\/tr>';
+              const regex = new RegExp(regex1 + regex2 + regex3);
+
               request(app)
                 .get(createdSchedulePath)
-                // つらい正規表現
-                .expect(/<tr><th>テスト候補1<\/th><td><button.*?>欠<\/button><\/td><\/tr><tr><th>テスト候補2<\/th><td><button.*?>欠<\/button><\/td><\/tr><tr><th>テスト候補3<\/th><td><button.*?>欠<\/button><\/td><\/tr><tr>/)
+                .expect(regex)
                 .expect(200)
                 .end((err, res) => { deleteScheduleAggregate(createdSchedulePath.split('/schedules/')[1], done, err); });
             });
