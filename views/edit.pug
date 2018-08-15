@@ -17,6 +17,8 @@ block content
           li.list-group-item #{candidate.candidateName}
       label(for="candidates").my-2 候補日程の追加 (改行して複数入力してください)
       textarea(name="candidates")#candidates.form-control
+      div#datepicker.date-picker-div
+        p カレンダーから候補日程を入力することも可能です
     div
       button(type="submit").btn.btn-info 以上の内容で予定を編集する
   h3.my-3 危険な変更
