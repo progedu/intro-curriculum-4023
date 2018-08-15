@@ -2,6 +2,8 @@
 import $ from 'jquery';
 const global = Function('return this;')();
 global.jQuery = $;
+import 'jquery-ui/ui/widgets/datepicker';
+import 'jquery-ui/ui/i18n/datepicker-ja';
 import bootstrap from 'bootstrap';
 
 $('.availability-toggle-button').each((i, e) => {
@@ -38,4 +40,19 @@ buttonSelfComment.click(() => {
         $('#self-comment').text(data.comment);
       });
   }
+});
+
+$(function () {
+  $('#datepicker').datepicker({
+    dateFormat: 'mm/dd(D)',
+    onSelect: (date) => {
+      const candidate = $('#candidates').val();
+      const datetime = date + ' 19:00〜';
+      if (candidate === "") {
+        $('#candidates').val(datetime);
+      } else {
+        jQuery('#candidates').val(candidate + '\n' + datetime);
+      }
+    }
+  });
 });
