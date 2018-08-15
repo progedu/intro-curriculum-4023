@@ -6,7 +6,7 @@ block content
     input(type="hidden" name="_csrf" value!=csrfToken)
     div.form-group
       label(for="scheduleName") 予定名
-      input(type="text" name="scheduleName" value=schedule.scheduleName)#scheduleName.form-control
+      input(type="text" name="scheduleName" value=schedule.scheduleName required)#scheduleName.form-control
     div.form-group
       label(for="memo") メモ
       textarea(name="memo")#memo.form-control #{schedule.memo}
