@@ -20,6 +20,16 @@ block content
     div
       button(type="submit").btn.btn-info 以上の内容で予定を編集する
   h3.my-3 危険な変更
-  form(method="post", action=`/schedules/${schedule.scheduleId}?delete=1`)
+  form(method="post", action=`/schedules/${schedule.scheduleId}?delete=1` onsubmit="return check()")
     input(type="hidden" name="_csrf" value!=csrfToken)
     button(type="submit").btn.btn-danger この予定を削除する
+
+  script(type='text/javascript').
+    function check(){
+      if(window.confirm('本当に削除しますか？')){
+        return true;
+      } else {
+        window.alert('キャンセルされました');
+        return false;
+      }
+    }
