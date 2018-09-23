@@ -119,6 +119,10 @@ router.get('/:scheduleId', authenticationEnsurer, (req, res, next) => {
         commentMap: commentMap
       });
     });
+  }).catch(() => {
+    const err = new Error('リクエストが不正です');
+    err.status = 400;
+    next(err);
   });
 });
 
@@ -145,6 +149,10 @@ router.get('/:scheduleId/edit', authenticationEnsurer, csrfProtection, (req, res
       err.status = 404;
       next(err);
     }
+  }).catch(() => {
+    const err = new Error('リクエストが不正です');
+    err.status = 400;
+    next(err);
   });
 });
 
