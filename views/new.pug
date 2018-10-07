@@ -19,22 +19,63 @@ block content
       textarea(name="memo" placeholder="予定の詳細")#memo.form-control
 
     div.form-group
-      label(for="candidates") 
-        #mdp.input-group.date
-          textarea.form-control(type='text' name="candidates" placeholder="候補日程")
-          script.
-            $('#mdp').multiDatesPicker({
-              dateFormat: "y-m-d",
-            });
-            //- $('#multidatespicker').multiDatesPicker({
-            //-     format: 'yyyy年MMdd日', //日付のフォーマット
-            //-     language:'ja', //日本語表示
-            //-     pickDate: true,
-            //-     pickTime: true,
-            //-     hourStep: 1,
-            //-     minuteStep: 15,
-            //-     secondStep: 30,
-            //-     inputMask: true
-            //- });
+      form#ExtendForm(name='ExtendForm')
+        button#addLine(href='javascript:void(0);') 日程追加
         br
-        button(type="submit").btn.btn-info 予定をつくる
+        #container(style='position:fixed;')
+          #sdate(style='float:left; width:200px;')
+            #addhere(style='float:relative; width:600px;')
+              #datepicker.input-group.date
+                #sdate(style='float:left; width:200px;')
+                  input.form-control.datepick(type="text" name='candidates' placeholder="候補日程")#candidates.form-control
+                #fieldtpl(style='display:none;')
+                  #sdate(style='float:left; width:200px;')
+                    input.form-control.datepick(type="text" name='candidates' placeholder="候補日程")#candidates.form-control
+          br
+          button(type="submit").btn.btn-info 予定をつくる
+
+
+        script.
+          $(document).ready(function(){
+              setDatePicker();
+          });
+
+          $('#addLine').on('click', function(){
+              var cont = document.getElementById('addhere'); 
+              var numfields = cont.getElementsByTagName("input").length; 
+              var div = document.createElement('div');
+              div.innerHTML = document.getElementById('fieldtpl').innerHTML;
+              $('#addhere').append(div.innerHTML);
+              setDatePicker();
+          });
+          
+          function setDatePicker() {
+              $( "#addhere .datepick").each(function() {
+                  $( this ).datepicker({
+                      changeMonth: true,
+                      changeYear: true,
+                      dateFormat: "yy年mm月dd日"
+                  });
+              });
+          }    
+          //- $(function () {
+          //-   $('#multidatepicker').multiDatesPicker({
+          //-       dateFormat: "yy年mm月dd日",
+          //-       showOn: "button",
+          //-       buttonText: "カレンダー",
+          //-       onSelect: function (selected_date) {
+          //-           $('#display').val(selected_date);
+          //-       }
+          //-   });
+          //- });
+          //- $('#multidatespicker').multiDatesPicker({
+          //-     format: 'yyyy年MMdd日', //日付のフォーマット
+          //-     language:'ja', //日本語表示
+          //-     pickDate: true,
+          //-     pickTime: true,
+          //-     hourStep: 1,
+          //-     minuteStep: 15,
+          //-     secondStep: 30,
+          //-     inputMask: true
+          //- });
+      
