@@ -19,3 +19,5 @@ block content
             td
               a(href=`/schedules/${schedule.scheduleId}`) #{schedule.scheduleName}
             td #{schedule.formattedUpdatedAt}
+    else
+      p.lead.my-3 予定はありません
