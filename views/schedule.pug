@@ -17,7 +17,10 @@ block content
     tr
       th 予定
       each user in users
-        th #{user.username}
+        if user.username
+          th #{user.username}
+        else
+          th #{user.username2}
     each candidate in candidates
       tr
         th #{candidate.candidateName}
