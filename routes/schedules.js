@@ -94,7 +94,6 @@ router.get('/:scheduleId', authenticationEnsurer, (req, res, next) => {
 
     // 全ユーザー、全候補で二重ループしてそれぞれの出欠の値がない場合には、「欠席」を設定する
     const users = Array.from(userMap).map((keyValue) => keyValue[1]);
-    console.log(users);
     users.forEach((u) => {
       storedCandidates.forEach((c) => {
         const map = availabilityMapMap.get(u.userId) || new Map();
@@ -135,6 +134,8 @@ router.get('/:scheduleId/edit', authenticationEnsurer, csrfProtection, (req, res
         where: { scheduleId: schedule.scheduleId },
         order: [['"candidateId"', 'ASC']]
       }).then((candidates) => {
+        console.log(schedule.createdBy)
+        console.log(req.user.id)
         res.render('edit', {
           user: req.user,
           schedule: schedule,
@@ -151,7 +152,7 @@ router.get('/:scheduleId/edit', authenticationEnsurer, csrfProtection, (req, res
 });
 
 function isMine(req, schedule) {
-  return schedule && parseInt(schedule.createdBy) === parseInt(req.user.id);
+  return schedule && parseInt(schedule.createdBy) === schedule.createdBy;
 }
 
 router.post('/:scheduleId', authenticationEnsurer, csrfProtection, (req, res, next) => {
