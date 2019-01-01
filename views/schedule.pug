@@ -48,3 +48,8 @@ block content
           td
             p
               small #{commentMap.get(user.userId)}
+  div.form-group
+    label(for="shareURL") 共有用 URL:
+    - var herokuURL = process.env.HEROKU_URL ? process.env.HEROKU_URL : 'http://localhost:8000/'
+    input(type="text" value=`${herokuURL}schedules/${schedule.scheduleId}/` readonly='true')#shareURL.form-control
+    button(data-clipboard-target=`#shareURL`).btn.btn-info コピー

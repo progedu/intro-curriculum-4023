@@ -3,6 +3,7 @@ import $ from 'jquery';
 const global = Function('return this;')();
 global.jQuery = $;
 import bootstrap from 'bootstrap';
+import clipboardJs from 'clipboard';
 
 $('.availability-toggle-button').each((i, e) => {
   const button = $(e);
@@ -39,3 +40,5 @@ buttonSelfComment.click(() => {
       });
   }
 });
+
+const clipboard = new clipboardJs('.btn');
