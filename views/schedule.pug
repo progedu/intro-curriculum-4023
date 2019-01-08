@@ -10,6 +10,12 @@ block content
       p 作成者: #{schedule.user.username}
   - var isMine = parseInt(user.id) === schedule.user.userId
   if isMine
+    div#tweet-area
+      a(href="https://twitter.com/intent/tweet?button_hashtag=こんどなにする？&ref_src=twsrc%5Etfw"
+        class="twitter-hashtag-button"
+        data-text=schedule.scheduleName
+        data-show-count="false") Tweet #こんどなにする？
+      script(async src="https://platform.twitter.com/widgets.js" charset="utf-8")
     div
       a(href=`/schedules/${schedule.scheduleId}/edit`).btn.btn-info この予定を編集する
   h3.my-3 出欠表
