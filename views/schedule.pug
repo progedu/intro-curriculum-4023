@@ -44,6 +44,10 @@ block content
             button(
               data-schedule-id=schedule.scheduleId
               data-user-id=user.userId)#self-comment-button.btn-xs.btn-info 編集
+            if commentMap.get(user.userId)
+              button(
+                data-schedule-id=schedule.scheduleId
+                data-user-id=user.userId)#delete-self-comment-button.btn-xs.btn-danger 削除
         else
           td
             p

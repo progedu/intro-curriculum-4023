@@ -36,6 +36,29 @@ buttonSelfComment.click(() => {
       { comment: comment },
       (data) => {
         $('#self-comment').text(data.comment);
+        $('#self-comment-button').after(
+          `<button class="btn-xs btn-danger" data-schedule-id="${scheduleId}" data-user-id="${userId}" id="delete-self-comment-button">削除</button>`
+        );
+        
       });
   }
 });
+
+const buttonDeleteComment = $('#delete-self-comment-button');
+deleteComment(buttonDeleteComment);
+
+function deleteComment(buttonDeleteComment) {
+  const confirmDeleteComment = confirm('コメントを消去してもよろしいですか？');
+  const scheduleId = buttonDeleteComment.data('schedule-id');
+  const userId = buttonSelfComment.data('user-id');
+  $(buttonDeleteComment).click(() => {
+    if (confirmDeleteComment) {
+      $.post(`/schedules/${scheduleId}/users/${userId}/comments?delete=1`,
+      { comment: "" },
+      (data) => {
+        $('#self-comment').text(data.comment);
+        $('#delete-self-comment-button').remove();
+      });
+    }
+  });
+}

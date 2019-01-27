@@ -18,4 +18,18 @@ router.post('/:scheduleId/users/:userId/comments', authenticationEnsurer, (req, 
   });
 });
 
+router.post('/:scheduleId/users/:userId/comments?delete=1', authenticationEnsurer, (req, res, next) => {
+  const scheduleId = req.params.scheduleId;
+  const userId = req.params.userId;
+  //const comment = "消去されました";
+
+  Comment.upsert({
+    scheduleId: scheduleId,
+    userId: userId,
+    comment: comment
+  }).then(() => {
+    res.json({ status: 'OK', comment: comment });
+  });
+});
+
 module.exports = router;
