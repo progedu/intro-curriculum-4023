@@ -37,10 +37,12 @@ buttonSelfComment.click(() => {
       { comment: comment },
       (data) => {
         $('#self-comment').text(data.comment);
-        $('#self-comment-button').after(buttonDeleteComment);
-        $("#delete-self-comment-button").click(() => {
+        if (!$("#delete-self-comment-button").length) {
+          $('#self-comment-button').after(buttonDeleteComment);
+          $("#delete-self-comment-button").click(() => {
           deleteComment(scheduleId, userId);
-        });
+          });
+        }
       });
   }
 });

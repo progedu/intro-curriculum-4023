@@ -132,10 +132,13 @@ buttonSelfComment.click(function () {
       comment: comment
     }, function (data) {
       jquery__WEBPACK_IMPORTED_MODULE_0___default()('#self-comment').text(data.comment);
-      jquery__WEBPACK_IMPORTED_MODULE_0___default()('#self-comment-button').after(buttonDeleteComment);
-      jquery__WEBPACK_IMPORTED_MODULE_0___default()("#delete-self-comment-button").click(function () {
-        deleteComment(scheduleId, userId);
-      });
+
+      if (!jquery__WEBPACK_IMPORTED_MODULE_0___default()("#delete-self-comment-button").length) {
+        jquery__WEBPACK_IMPORTED_MODULE_0___default()('#self-comment-button').after(buttonDeleteComment);
+        jquery__WEBPACK_IMPORTED_MODULE_0___default()("#delete-self-comment-button").click(function () {
+          deleteComment(scheduleId, userId);
+        });
+      }
     });
   }
 });
