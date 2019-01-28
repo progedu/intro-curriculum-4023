@@ -55,6 +55,12 @@ passport.use(new GitHubStrategy({
   }
 ));
 
+var LocalStrategy = require('passport-local').Strategy;
+
+passport.use(new LocalStrategy({
+  // TODO ユーザー名とパスワードによる認証の手順を書く
+}))
+
 var indexRouter = require('./routes/index');
 var loginRouter = require('./routes/login');
 var logoutRouter = require('./routes/logout');
