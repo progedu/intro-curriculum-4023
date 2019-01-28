@@ -125,33 +125,36 @@ buttonSelfComment.click(function () {
   var scheduleId = buttonSelfComment.data('schedule-id');
   var userId = buttonSelfComment.data('user-id');
   var comment = prompt('コメントを255文字以内で入力してください。');
+  var buttonDeleteComment = "<button class=\"btn-xs btn-danger\" data-schedule-id=\"".concat(scheduleId, "\" data-user-id=\"").concat(userId, "\" id=\"delete-self-comment-button\">\u524A\u9664</button>");
 
   if (comment) {
     jquery__WEBPACK_IMPORTED_MODULE_0___default.a.post("/schedules/".concat(scheduleId, "/users/").concat(userId, "/comments"), {
       comment: comment
     }, function (data) {
       jquery__WEBPACK_IMPORTED_MODULE_0___default()('#self-comment').text(data.comment);
-      jquery__WEBPACK_IMPORTED_MODULE_0___default()('#self-comment-button').after("<button class=\"btn-xs btn-danger\" data-schedule-id=\"".concat(scheduleId, "\" data-user-id=\"").concat(userId, "\" id=\"delete-self-comment-button\">\u524A\u9664</button>"));
+      jquery__WEBPACK_IMPORTED_MODULE_0___default()('#self-comment-button').after(buttonDeleteComment);
+      jquery__WEBPACK_IMPORTED_MODULE_0___default()("#delete-self-comment-button").click(function () {
+        deleteComment(scheduleId, userId);
+      });
     });
   }
 });
 var buttonDeleteComment = jquery__WEBPACK_IMPORTED_MODULE_0___default()('#delete-self-comment-button');
-deleteComment(buttonDeleteComment);
-
-function deleteComment(buttonDeleteComment) {
-  var confirmDeleteComment = confirm('コメントを消去してもよろしいですか？');
+buttonDeleteComment.click(function () {
   var scheduleId = buttonDeleteComment.data('schedule-id');
   var userId = buttonSelfComment.data('user-id');
-  jquery__WEBPACK_IMPORTED_MODULE_0___default()(buttonDeleteComment).click(function () {
-    if (confirmDeleteComment) {
-      jquery__WEBPACK_IMPORTED_MODULE_0___default.a.post("/schedules/".concat(scheduleId, "/users/").concat(userId, "/comments?delete=1"), {
-        comment: ""
-      }, function (data) {
-        jquery__WEBPACK_IMPORTED_MODULE_0___default()('#self-comment').text(data.comment);
-        jquery__WEBPACK_IMPORTED_MODULE_0___default()('#delete-self-comment-button').remove();
-      });
-    }
-  });
+  deleteComment(scheduleId, userId);
+});
+
+function deleteComment(scheduleId, userId) {
+  if (confirm('コメントを消去してもよろしいですか？')) {
+    jquery__WEBPACK_IMPORTED_MODULE_0___default.a.post("/schedules/".concat(scheduleId, "/users/").concat(userId, "/comments?delete=1"), {
+      comment: ""
+    }, function (data) {
+      jquery__WEBPACK_IMPORTED_MODULE_0___default()('#self-comment').text(data.comment);
+      jquery__WEBPACK_IMPORTED_MODULE_0___default()('#delete-self-comment-button').remove();
+    });
+  }
 }
 
 /***/ }),
