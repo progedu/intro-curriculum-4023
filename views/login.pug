@@ -3,8 +3,11 @@ extends layout
 block content
   a(href="/auth/github").btn.btn-info.my-3 GitHubでログイン
   br
-  form(action="/auth/local", method="post")
-    input(type="text", name="username", placeholder="UserName")
-    br
-    input(type="password", name="password", placeholder="Password")
-    input(type="submit", value="Login")
+  div.card
+    p.card-header GitHub以外でログイン
+    div.card-body
+      form(action="/auth/local", method="post")
+        input(type="text", name="username", placeholder="UserName")
+        br
+        input(type="password", name="password", placeholder="Password")
+        input(type="submit", value="Login")
