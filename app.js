@@ -57,9 +57,18 @@ passport.use(new GitHubStrategy({
 
 var LocalStrategy = require('passport-local').Strategy;
 
-passport.use(new LocalStrategy({
-  // TODO ユーザー名とパスワードによる認証の手順を書く
-}))
+passport.use(new LocalStrategy(
+  function(username, password, done) {
+    // 非同期で処理させるといいらしい
+    process.nextTick(function(err){
+      // TODO RDBを利用した認証に置き換える
+      if(username === 'testuser' && password === 'testtest') {
+        return done(null, {username: username, userid: 0});
+      } else {
+        return done(err);
+      }
+    });
+  }));
 
 var indexRouter = require('./routes/index');
 var loginRouter = require('./routes/login');
@@ -99,6 +108,21 @@ app.get('/auth/github',
 
 app.get('/auth/github/callback',
   passport.authenticate('github', { failureRedirect: '/login' }),
+  function (req, res) {
+    var loginFrom = req.cookies.loginFrom;
+    // オープンリダイレクタ脆弱性対策
+    if (loginFrom &&
+      loginFrom.indexOf('http://') < 0 &&
+      loginFrom.indexOf('https://') < 0) {
+      res.clearCookie('loginFrom');
+      res.redirect(loginFrom);
+    } else {
+      res.redirect('/');
+    }
+  });
+
+app.post('/auth/local',
+  passport.authenticate('local', { failureRedirect: '/login'}),
   function (req, res) {
     var loginFrom = req.cookies.loginFrom;
     // オープンリダイレクタ脆弱性対策
