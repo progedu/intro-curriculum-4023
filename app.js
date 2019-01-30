@@ -63,7 +63,7 @@ passport.use(new LocalStrategy(
     process.nextTick(function(err){
       // TODO RDBを利用した認証に置き換える
       if(username === 'testuser' && password === 'testtest') {
-        return done(null, {username: username, userid: 0});
+        return done(null, {username: username, id: 0});
       } else {
         return done(err);
       }
