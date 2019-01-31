@@ -29,6 +29,11 @@ var GitHubStrategy = require('passport-github2').Strategy;
 var GITHUB_CLIENT_ID = process.env.GITHUB_CLIENT_ID || '2f831cb3d4aac02393aa';
 var GITHUB_CLIENT_SECRET = process.env.GITHUB_CLIENT_SECRET || '9fbc340ac0175123695d2dedfbdf5a78df3b8067';
 
+// TODO サービス公開の際はIDとSECRETをサーバーの環境変数から読み込む設定をかくこと
+var Auth0Strategy = require('passport-auth0').Strategy;
+var AUTH0_CLIENT_ID = 'eKWbdnubCoWrjqq8KMuMX6fwmu4eoNG0';
+var AUTH0_CLIENT_SECRET = 'jS6e60viZXgTjUXStbUk0QYb6RxbgYtCjPVlnUDOuPS8ringgsPCIaE1oeykna4h';
+
 passport.serializeUser(function (user, done) {
   done(null, user);
 });
@@ -55,20 +60,26 @@ passport.use(new GitHubStrategy({
   }
 ));
 
-var LocalStrategy = require('passport-local').Strategy;
-
-passport.use(new LocalStrategy(
-  function(username, password, done) {
-    // 非同期で処理させるといいらしい
-    process.nextTick(function(err){
-      // TODO RDBを利用した認証に置き換える
-      if(username === 'testuser' && password === 'testtest') {
-        return done(null, {username: username, id: 0});
-      } else {
-        return done(err);
-      }
+passport.use(new Auth0Strategy({
+  domain: 'albertgh1996.auth0.com',
+  clientID: AUTH0_CLIENT_ID,
+  clientSecret: AUTH0_CLIENT_SECRET,
+  callbackURL: 'http://localhost:8000/auth/auth0/callback'
+},
+  function (accessToken, refreshToken, profile, done) {
+    process.nextTick(function () {
+      console.log(profile);
+      const profileSubHex = profile.sub.split("|")[1];
+      const profileSubDec = parseInt(profileSubHex);
+      User.upsert({
+        userId: profileSubDec,
+        username: profile.nickname
+      }).then(() => {
+        done(null, ({ id: profileSubDec, username: profile.nickname }));
+      });
     });
-  }));
+  }
+));
 
 var indexRouter = require('./routes/index');
 var loginRouter = require('./routes/login');
@@ -106,6 +117,11 @@ app.get('/auth/github',
   function (req, res) {
   });
 
+app.get('/auth/auth0',
+  passport.authenticate('auth0', {}),
+  function (req, res) {
+  });
+
 app.get('/auth/github/callback',
   passport.authenticate('github', { failureRedirect: '/login' }),
   function (req, res) {
@@ -121,8 +137,8 @@ app.get('/auth/github/callback',
     }
   });
 
-app.post('/auth/local',
-  passport.authenticate('local', { failureRedirect: '/login'}),
+app.get('/auth/auth0/callback',
+  passport.authenticate('auth0', { failureRedirect: '/login'}),
   function (req, res) {
     var loginFrom = req.cookies.loginFrom;
     // オープンリダイレクタ脆弱性対策
