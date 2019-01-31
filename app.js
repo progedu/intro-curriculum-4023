@@ -64,12 +64,14 @@ passport.use(new Auth0Strategy({
   domain: 'albertgh1996.auth0.com',
   clientID: AUTH0_CLIENT_ID,
   clientSecret: AUTH0_CLIENT_SECRET,
-  callbackURL: 'http://localhost:8000/auth/auth0/callback'
+  callbackURL: 'http://localhost:8000/auth/auth0/callback',
+  state: false
 },
   function (accessToken, refreshToken, profile, done) {
     process.nextTick(function () {
       console.log(profile);
-      const profileSubHex = profile.sub.split("|")[1];
+      console.log(profile.id)
+      const profileSubHex = profile.id.split("|")[1];
       const profileSubDec = parseInt(profileSubHex);
       User.upsert({
         userId: profileSubDec,
@@ -118,7 +120,7 @@ app.get('/auth/github',
   });
 
 app.get('/auth/auth0',
-  passport.authenticate('auth0', {}),
+  passport.authenticate('auth0', {connection: 'Username-Password-Authentication'}),
   function (req, res) {
   });
 
