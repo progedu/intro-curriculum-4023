@@ -70,14 +70,16 @@ passport.use(new Auth0Strategy({
   function (accessToken, refreshToken, profile, done) {
     process.nextTick(function () {
       console.log(profile);
-      console.log(profile.id)
-      const profileSubHex = profile.id.split("|")[1];
-      const profileSubDec = parseInt(profileSubHex);
+      if (!profile.id) {
+        console.log('USR EMPTY');
+        throw new Error('user null');
+      }
+      const profileIdHexToDec = parseInt(profile.id.split("|")[1]);
       User.upsert({
-        userId: profileSubDec,
+        userId: profileIdHexToDec,
         username: profile.nickname
       }).then(() => {
-        done(null, ({ id: profileSubDec, username: profile.nickname }));
+        done(null, ({ id: profileIdHexToDec, username: profile.nickname }));
       });
     });
   }
@@ -120,7 +122,7 @@ app.get('/auth/github',
   });
 
 app.get('/auth/auth0',
-  passport.authenticate('auth0', {connection: 'Username-Password-Authentication'}),
+  passport.authenticate('auth0', {}),
   function (req, res) {
   });
 

@@ -7,6 +7,7 @@
     "test": "node_modules/.bin/mocha --timeout 10000"
   },
   "dependencies": {
+    "auth0": "^2.14.0",
     "bootstrap": "^4.0.0",
     "cookie-parser": "~1.4.3",
     "csurf": "^1.8.3",
