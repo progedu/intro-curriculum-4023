@@ -7,6 +7,7 @@
     "test": "node_modules/.bin/mocha --timeout 10000"
   },
   "dependencies": {
+    "auth0": "^2.14.0",
     "bootstrap": "^4.0.0",
     "cookie-parser": "~1.4.3",
     "csurf": "^1.8.3",
@@ -18,6 +19,7 @@
     "jquery": "^3.3.1",
     "morgan": "~1.9.0",
     "passport": "^0.3.2",
+    "passport-auth0": "^1.1.0",
     "passport-github2": "^0.1.9",
     "passport-local": "^1.0.0",
     "pg": "^7.4.1",

@@ -2,12 +2,4 @@ extends layout
 
 block content
   a(href="/auth/github").btn.btn-info.my-3 GitHubでログイン
-  br
-  div.card
-    p.card-header GitHub以外でログイン
-    div.card-body
-      form(action="/auth/local", method="post")
-        input(type="text", name="username", placeholder="UserName")
-        br
-        input(type="password", name="password", placeholder="Password")
-        input(type="submit", value="Login")
+  a(href="https://albertgh1996.auth0.com/v2/logout?client_id=eKWbdnubCoWrjqq8KMuMX6fwmu4eoNG0&returnTo=http://localhost:8000/auth/auth0").btn.btn-danger.my-3 メールアドレスとパスワードでログイン
