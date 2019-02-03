@@ -71,7 +71,6 @@ passport.use(new Auth0Strategy({
     process.nextTick(function () {
       console.log(profile);
       if (!profile.id) {
-        console.log('USR EMPTY');
         throw new Error('user null');
       }
       const profileIdHexToDec = parseInt(profile.id.split("|")[1]);
