@@ -25,7 +25,7 @@ describe('/login', () => {
     request(app)
       .get('/login')
       .expect('Content-Type', 'text/html; charset=utf-8')
-      .expect(/<a href="\/auth\/github"/)
+      .expect(/<a class="btn btn-info my-3" href="\/auth\/github"/)
       .expect(200, done);
   });
 
@@ -215,7 +215,7 @@ describe('/schedules/:scheduleId?edit=1', () => {
                 .set('cookie', setCookie)
                 .send({ scheduleName: 'テスト更新予定2', memo: 'テスト更新メモ2', candidates: 'テスト更新候補2', _csrf: csrf })
                 .end((err, res) => {
-                  Schedule.findById(scheduleId).then((s) => {
+                  Schedule.findByPk(scheduleId).then((s) => {
                     assert.equal(s.scheduleName, 'テスト更新予定2');
                     assert.equal(s.memo, 'テスト更新メモ2');
                   });
