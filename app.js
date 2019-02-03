@@ -69,10 +69,6 @@ passport.use(new Auth0Strategy({
 },
   function (accessToken, refreshToken, profile, done) {
     process.nextTick(function () {
-      console.log(profile);
-      if (!profile.id) {
-        throw new Error('user null');
-      }
       const profileIdHexToDec = parseInt(profile.id.split("|")[1]);
       User.upsert({
         userId: profileIdHexToDec,
