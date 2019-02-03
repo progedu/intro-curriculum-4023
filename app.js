@@ -90,6 +90,7 @@ var logoutRouter = require('./routes/logout');
 var schedulesRouter = require('./routes/schedules');
 var availabilitiesRouter = require('./routes/availabilities');
 var commentsRouter = require('./routes/comments');
+var auth0LoginRouter = require('./routes/auth0-login');
 
 var app = express();
 app.use(helmet());
@@ -114,6 +115,7 @@ app.use('/logout', logoutRouter);
 app.use('/schedules', schedulesRouter);
 app.use('/schedules', availabilitiesRouter);
 app.use('/schedules', commentsRouter);
+app.use('/auth/auth0/login', auth0LoginRouter);
 
 app.get('/auth/github',
   passport.authenticate('github', { scope: ['user:email'] }),
