@@ -69,12 +69,13 @@ passport.use(new Auth0Strategy({
 },
   function (accessToken, refreshToken, profile, done) {
     process.nextTick(function () {
-      const profileIdHexToDec = parseInt(profile.id.split("|")[1]);
+      const profileIdHex = profile.user_id.split("|")[1];
+      const profileIdDec = parseInt(profileIdHex, 16);
       User.upsert({
-        userId: profileIdHexToDec,
+        userId: profileIdDec,
         username: profile.nickname
       }).then(() => {
-        done(null, ({ id: profileIdHexToDec, username: profile.nickname }));
+        done(null, ({ id: profileIdDec, username: profile.nickname }));
       });
     });
   }
