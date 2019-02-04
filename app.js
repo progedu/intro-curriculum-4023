@@ -70,7 +70,8 @@ passport.use(new Auth0Strategy({
   function (accessToken, refreshToken, profile, done) {
     process.nextTick(function () {
       const profileIdHex = profile.user_id.split("|")[1];
-      const profileIdDec = parseInt(profileIdHex, 16);
+      const idHexShorten = profileIdHex.slice(0, 7);
+      const profileIdDec = parseInt(idHexShorten, 16);
       User.upsert({
         userId: profileIdDec,
         username: profile.nickname
