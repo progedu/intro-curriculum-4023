@@ -177,7 +177,7 @@ router.post('/:scheduleId', authenticationEnsurer, csrfProtection, (req, res, ne
             if (candidateNames) {
               createCandidatesAndRedirect(candidateNames, schedule.scheduleId, res);
             } else {
-              res.redirect('/schedules/' + schedule.scheduleId);
+              res.redirect('/');
             }
           });
         });
@@ -236,7 +236,7 @@ function createCandidatesAndRedirect(candidateNames, scheduleId, res) {
     };
   });
   Candidate.bulkCreate(candidates).then(() => {
-    res.redirect('/schedules/' + scheduleId);
+    res.redirect('/');
   });
 }
 
