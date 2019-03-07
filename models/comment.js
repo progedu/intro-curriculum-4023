@@ -4,13 +4,18 @@ const Sequelize = loader.Sequelize;
 
 const Comment = loader.database.define('comments', {
   scheduleId: {
-    type: Sequelize.UUID,
+    type:Sequelize.UUID,
     primaryKey: true,
     allowNull: false
   },
   userId: {
-    type: Sequelize.INTEGER,
+    type: Sequelize.BIGINT,
     primaryKey: true,
+    allowNull: false
+  },
+  userProvider: {
+    type: Sequelize.STRING,
+    primaryKey:true,
     allowNull: false
   },
   comment: {
@@ -18,8 +23,8 @@ const Comment = loader.database.define('comments', {
     allowNull: false
   }
 }, {
-    freezeTableName: true,
-    timestamps: false
-  });
+  freezeTableName: true,
+  timestamps: false
+});
 
 module.exports = Comment;

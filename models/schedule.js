@@ -17,7 +17,11 @@ const Schedule = loader.database.define('schedules', {
     allowNull: false
   },
   createdBy: {
-    type: Sequelize.INTEGER,
+    type: Sequelize.BIGINT,
+    allowNull: false
+  },
+  userProvider: {
+    type: Sequelize.STRING,
     allowNull: false
   },
   updatedAt: {
@@ -29,7 +33,7 @@ const Schedule = loader.database.define('schedules', {
     timestamps: false,
     indexes: [
       {
-        fields: ['createdBy']
+        fields: ['createdBy','userProvider']
       }
     ]
   });
