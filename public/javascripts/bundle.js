@@ -99,7 +99,23 @@ __webpack_require__.r(__webpack_exports__);
 
 var global = Function('return this;')();
 global.jQuery = jquery__WEBPACK_IMPORTED_MODULE_0___default.a;
+ //validation.js
 
+window.addEventListener('load', function () {
+  // カスタムブートストラップ検証スタイルを適用するすべてのフォームを取得
+  var forms = document.getElementsByClassName('needs-validation'); // ループして帰順を防ぐ
+
+  var validation = Array.prototype.filter.call(forms, function (form) {
+    form.addEventListener('submit', function (event) {
+      if (form.checkValidity() === false) {
+        event.preventDefault();
+        event.stopPropagation();
+      }
+
+      form.classList.add('was-validated');
+    }, false);
+  });
+}, false);
 jquery__WEBPACK_IMPORTED_MODULE_0___default()('.availability-toggle-button').each(function (i, e) {
   var button = jquery__WEBPACK_IMPORTED_MODULE_0___default()(e);
   button.click(function () {
