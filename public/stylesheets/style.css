@@ -2,7 +2,7 @@
   position: relative !important;
 }
 .form-control.is-valid, .was-validated .form-control:valid {
-  background-image: url("valid.png");
+  background-image: url("valid.png") ;
   background-repeat: no-repeat;
   background-position: center right calc(.375em + .1875rem);
   background-size: calc(.75em + .375rem) calc(.75em + .375rem);
@@ -24,3 +24,7 @@ nav .navbar-nav li a{
 nav .navbar-nav li a:hover{
   background-color: gray;
   }
+.d-table{
+  border-collapse: separate;
+  border-spacing: 0 5px;
+}
