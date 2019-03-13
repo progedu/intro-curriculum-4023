@@ -14,8 +14,13 @@ block content
         tr
           th 予定名
           th 更新日時
+        - var now = new Date()
+        - var recentTimeSpan = 10000 // 新着間隔を ms 単位で指定
         each schedule in schedules
           tr
             td
+              if now - schedule.updatedAt < recentTimeSpan
+                span.badge.badge-success New!
+                span &nbsp;
               a(href=`/schedules/${schedule.scheduleId}`) #{schedule.scheduleName}
             td #{schedule.formattedUpdatedAt}
