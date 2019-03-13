@@ -2,7 +2,13 @@
 import $ from 'jquery';
 const global = Function('return this;')();
 global.jQuery = $;
+require('popper.js');
 import bootstrap from 'bootstrap';
+require('bootstrap-confirmation2');
+$('[data-toggle=confirmation]').confirmation({
+  rootSelector: '[data-toggle=confirmation]',
+  // other options
+});
 
 //validation.js
 window.addEventListener('load', function() {
