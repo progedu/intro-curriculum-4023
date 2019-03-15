@@ -4,7 +4,8 @@
   "private": true,
   "scripts": {
     "start": "node ./bin/www",
-    "test": "node_modules/.bin/mocha --timeout 10000 --exit"
+    "test": "node_modules/.bin/mocha --timeout 10000 --exit",
+    "build": "node_modules/.bin/webpack"
   },
   "dependencies": {
     "bootstrap": "^4.0.0",
