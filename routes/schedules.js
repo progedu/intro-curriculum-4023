@@ -175,6 +175,39 @@ router.post('/:scheduleId', authenticationEnsurer, csrfProtection, (req, res, ne
             // 追加されているかチェック
             const candidateNames = parseCandidateNames(req);
             if (candidateNames) {
+              
+              // ↓↓↓↓↓ debug ここから追加 ↓↓↓↓↓
+              if (Array.isArray(req.body.cndGroupID)){ // 配列かどうかの判断
+                let idx = 0; // 添え字
+                req.body.cndGroupID.forEach(() => {
+                  // debugログ
+                  console.log("isArray");
+                  console.log("candidateId:"+ req.body.cndGroupID[idx]);
+                  console.log("candidateName:" + req.body.cndGroupName[idx]);
+                  console.log("----------------------------------------");
+                  // 既存候補日を更新
+                  Candidate.update({
+                    candidateName: req.body.cndGroupName[idx] },{
+                    where: { candidateId: req.body.cndGroupID[idx] }
+                  })
+                  // 添え字をカウントアップ
+                  idx ++;
+                });
+              } else {
+                // 既存候補日が1件の時は配列にならないので添え字を使わない
+                // debugログ
+                console.log("isNotArray");
+                console.log("candidateId:"+ req.body.cndGroupID);
+                console.log("candidateName:" + req.body.cndGroupName);
+                console.log("----------------------------------------");
+                // 既存候補日を更新
+                Candidate.update({
+                  candidateName: req.body.cndGroupName },{
+                  where: { candidateId: req.body.cndGroupID }
+                })
+              }
+              // ↑↑↑↑↑ debug ここまで ↑↑↑↑↑
+              
               createCandidatesAndRedirect(candidateNames, schedule.scheduleId, res);
             } else {
               res.redirect('/schedules/' + schedule.scheduleId);
@@ -234,7 +267,7 @@ function createCandidatesAndRedirect(candidateNames, scheduleId, res) {
       scheduleId: scheduleId
     };});
     Candidate.bulkCreate(candidates).then(() => {
-          res.redirect('/schedules/' + scheduleId);
+           res.redirect('/schedules/' + scheduleId);
     });
 }
 
