@@ -34,7 +34,7 @@ const buttonSelfComment = $('#self-comment-button');
 buttonSelfComment.click(() => {
   const scheduleId = buttonSelfComment.data('schedule-id');
   const userId = buttonSelfComment.data('user-id');
-  const comment = prompt('コメントを255文字以内で入力してください。');
+  const comment = prompt('コメントを255文字以内で入力してください。', $('#self-comment').text());
   if (comment) {
     $.post(`/schedules/${scheduleId}/users/${userId}/comments`,
       { comment: comment },
