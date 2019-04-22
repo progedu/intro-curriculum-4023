@@ -31,11 +31,36 @@ buttonSelfComment.click(() => {
   const scheduleId = buttonSelfComment.data('schedule-id');
   const userId = buttonSelfComment.data('user-id');
   const comment = prompt('コメントを255文字以内で入力してください。');
+  const buttonDeleteComment = `<button class="btn-xs btn-danger" data-schedule-id="${scheduleId}" data-user-id="${userId}" id="delete-self-comment-button">削除</button>`;
   if (comment) {
     $.post(`/schedules/${scheduleId}/users/${userId}/comments`,
       { comment: comment },
       (data) => {
         $('#self-comment').text(data.comment);
+        if (!$("#delete-self-comment-button").length) {
+          $('#self-comment-button').after(buttonDeleteComment);
+          $("#delete-self-comment-button").click(() => {
+          deleteComment(scheduleId, userId);
+          });
+        }
       });
   }
 });
+
+const buttonDeleteComment = $('#delete-self-comment-button');
+buttonDeleteComment.click(() => {
+  const scheduleId = buttonDeleteComment.data('schedule-id');
+  const userId = buttonSelfComment.data('user-id');
+  deleteComment(scheduleId, userId);
+});
+
+function deleteComment(scheduleId, userId) {
+  if (confirm('コメントを消去してもよろしいですか？')) {
+    $.post(`/schedules/${scheduleId}/users/${userId}/comments?delete=1`,
+    { comment: "" },
+    (data) => {
+      $('#self-comment').text(data.comment);
+      $('#delete-self-comment-button').remove();
+    });
+  }
+}

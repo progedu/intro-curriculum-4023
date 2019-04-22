@@ -7,6 +7,7 @@
     "test": "node_modules/.bin/mocha --timeout 10000 --exit"
   },
   "dependencies": {
+    "auth0": "^2.14.0",
     "bootstrap": "^4.0.0",
     "cookie-parser": "~1.4.3",
     "csurf": "^1.8.3",
@@ -17,14 +18,16 @@
     "http-errors": "~1.6.2",
     "jquery": "^3.3.1",
     "morgan": "~1.9.0",
-    "uuid": "^3.3.2",
     "passport": "^0.3.2",
+    "passport-auth0": "^1.1.0",
     "passport-github2": "^0.1.9",
+    "passport-local": "^1.0.0",
     "pg": "^7.4.1",
     "pg-hstore": "^2.3.2",
     "popper.js": "^1.14.0",
     "pug": "2.0.0-beta11",
-    "sequelize": "^4.33.4"
+    "sequelize": "^4.33.4",
+    "uuid": "^3.3.2"
   },
   "devDependencies": {
     "@babel/core": "^7.1.6",

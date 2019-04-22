@@ -29,6 +29,11 @@ var GitHubStrategy = require('passport-github2').Strategy;
 var GITHUB_CLIENT_ID = process.env.GITHUB_CLIENT_ID || '2f831cb3d4aac02393aa';
 var GITHUB_CLIENT_SECRET = process.env.GITHUB_CLIENT_SECRET || '9fbc340ac0175123695d2dedfbdf5a78df3b8067';
 
+// TODO サービス公開の際はIDとSECRETをサーバーの環境変数から読み込む設定をかくこと
+var Auth0Strategy = require('passport-auth0').Strategy;
+var AUTH0_CLIENT_ID = process.env.AUTH0_CLIENT_ID || 'eKWbdnubCoWrjqq8KMuMX6fwmu4eoNG0';
+var AUTH0_CLIENT_SECRET = process.env.AUTH0_CLIENT_SECRET || 'jS6e60viZXgTjUXStbUk0QYb6RxbgYtCjPVlnUDOuPS8ringgsPCIaE1oeykna4h';
+
 passport.serializeUser(function (user, done) {
   done(null, user);
 });
@@ -55,12 +60,35 @@ passport.use(new GitHubStrategy({
   }
 ));
 
+passport.use(new Auth0Strategy({
+  domain: 'albertgh1996.auth0.com',
+  clientID: AUTH0_CLIENT_ID,
+  clientSecret: AUTH0_CLIENT_SECRET,
+  callbackURL: process.env.HEROKU_URL ? process.env.HEROKU_URL + 'auth/auth0/callback' : 'http://localhost:8000/auth/auth0/callback',
+  state: false
+},
+  function (accessToken, refreshToken, profile, done) {
+    process.nextTick(function () {
+      const profileIdHex = profile.user_id.split("|")[1];
+      const idHexShorten = profileIdHex.slice(0, 7);
+      const profileIdDec = parseInt(idHexShorten, 16);
+      User.upsert({
+        userId: profileIdDec,
+        username: profile.nickname
+      }).then(() => {
+        done(null, ({ id: profileIdDec, username: profile.nickname }));
+      });
+    });
+  }
+));
+
 var indexRouter = require('./routes/index');
 var loginRouter = require('./routes/login');
 var logoutRouter = require('./routes/logout');
 var schedulesRouter = require('./routes/schedules');
 var availabilitiesRouter = require('./routes/availabilities');
 var commentsRouter = require('./routes/comments');
+var auth0LoginRouter = require('./routes/auth0-login');
 
 var app = express();
 app.use(helmet());
@@ -85,9 +113,15 @@ app.use('/logout', logoutRouter);
 app.use('/schedules', schedulesRouter);
 app.use('/schedules', availabilitiesRouter);
 app.use('/schedules', commentsRouter);
+app.use('/auth/auth0/login', auth0LoginRouter);
 
 app.get('/auth/github',
   passport.authenticate('github', { scope: ['user:email'] }),
+  function (req, res) {
+  });
+
+app.get('/auth/auth0',
+  passport.authenticate('auth0', {}),
   function (req, res) {
   });
 
@@ -99,6 +133,21 @@ app.get('/auth/github/callback',
     if (loginFrom &&
       !loginFrom.includes('http://') &&
       !loginFrom.includes('https://')) {
+      res.clearCookie('loginFrom');
+      res.redirect(loginFrom);
+    } else {
+      res.redirect('/');
+    }
+  });
+
+app.get('/auth/auth0/callback',
+  passport.authenticate('auth0', { failureRedirect: '/login'}),
+  function (req, res) {
+    var loginFrom = req.cookies.loginFrom;
+    // オープンリダイレクタ脆弱性対策
+    if (loginFrom &&
+      loginFrom.indexOf('http://') < 0 &&
+      loginFrom.indexOf('https://') < 0) {
       res.clearCookie('loginFrom');
       res.redirect(loginFrom);
     } else {
