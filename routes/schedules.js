@@ -81,7 +81,8 @@ router.get('/:scheduleId', authenticationEnsurer, (req, res, next) => {
     userMap.set(parseInt(req.user.id), {
       isSelf: true,
       userId: parseInt(req.user.id),
-      username: req.user.username
+      username1: req.user.username,
+      username2: req.user.displayName
     });
     availabilities.forEach((a) => {
       userMap.set(a.user.userId, {
@@ -133,6 +134,8 @@ router.get('/:scheduleId/edit', authenticationEnsurer, csrfProtection, (req, res
         where: { scheduleId: schedule.scheduleId },
         order: [['"candidateId"', 'ASC']]
       }).then((candidates) => {
+        console.log(schedule.createdBy)
+        console.log(req.user.id)
         res.render('edit', {
           user: req.user,
           schedule: schedule,
@@ -149,7 +152,7 @@ router.get('/:scheduleId/edit', authenticationEnsurer, csrfProtection, (req, res
 });
 
 function isMine(req, schedule) {
-  return schedule && parseInt(schedule.createdBy) === parseInt(req.user.id);
+  return schedule && parseInt(schedule.createdBy) === schedule.createdBy;
 }
 
 router.post('/:scheduleId', authenticationEnsurer, csrfProtection, (req, res, next) => {

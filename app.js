@@ -29,6 +29,10 @@ var GitHubStrategy = require('passport-github2').Strategy;
 var GITHUB_CLIENT_ID = process.env.GITHUB_CLIENT_ID || '2f831cb3d4aac02393aa';
 var GITHUB_CLIENT_SECRET = process.env.GITHUB_CLIENT_SECRET || '9fbc340ac0175123695d2dedfbdf5a78df3b8067';
 
+var GoogleStrategy = require('passport-google-oauth20').Strategy;
+var GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID || '348887585113-tp3pbp93qoe0ajdium33udgta28bt0to.apps.googleusercontent.com';
+var GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET || 'TppVLzZVGqZoic0JhsOEe85V';
+
 passport.serializeUser(function (user, done) {
   done(null, user);
 });
@@ -54,6 +58,24 @@ passport.use(new GitHubStrategy({
     });
   }
 ));
+
+passport.use(new GoogleStrategy({
+  clientID: GOOGLE_CLIENT_ID,
+  clientSecret: GOOGLE_CLIENT_SECRET,
+  callbackURL: process.env.HEROKU_URL ? process.env.HEROKU_URL + 'auth/google/callback' : 'http://localhost:8000/auth/google/callback'
+},
+function(accessToken, refreshToken, profile, done) {
+  process.nextTick(function () {
+    User.upsert({
+      userId: profile.id,
+      username: profile.displayName
+    }).then(() => {
+      done(null, profile);
+    });
+  });
+}
+));
+
 
 var indexRouter = require('./routes/index');
 var loginRouter = require('./routes/login');
@@ -105,6 +127,26 @@ app.get('/auth/github/callback',
       res.redirect('/');
     }
   });
+
+  app.get('/auth/google',
+  passport.authenticate('google', { scope: ['profile'] }));
+
+app.get('/auth/google/callback', 
+  passport.authenticate('google', { failureRedirect: '/login' }),
+  function(req, res) {
+    var loginFrom = req.cookies.loginFrom;
+    console.log(loginFrom);
+    // オープンリダイレクタ脆弱性対策
+    if (loginFrom &&
+      !loginFrom.includes('http://') &&
+      !loginFrom.includes('https://')) {
+      res.clearCookie('loginFrom');
+      res.redirect(loginFrom);
+   } else {
+      res.redirect('/');
+    }
+  });
+
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
