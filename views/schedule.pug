@@ -18,13 +18,17 @@ block content
       th 予定
       each user in users
         th #{user.username}
+      th 出席合計
     each candidate in candidates
+      - var sum = 0;
       tr
         th #{candidate.candidateName}
         each user in users
           - var availability = availabilityMapMap.get(user.userId).get(candidate.candidateId)
           - var availabilityLabels = ['欠', '？', '出'];
           - var buttonStyles = ['btn-danger', 'btn-secondary', 'btn-success'];
+          if availability === 2
+            - sum++;
           td
             if user.isSelf
               button(class=`availability-toggle-button btn-lg ${buttonStyles[availability]}`
@@ -34,6 +38,7 @@ block content
                 data-availability=availability) #{availabilityLabels[availability]}
             else
               h3 #{availabilityLabels[availability]}
+        td #{sum}
     tr
       th コメント
       each user in users
@@ -48,3 +53,4 @@ block content
           td
             p
               small #{commentMap.get(user.userId)}
+      td 
