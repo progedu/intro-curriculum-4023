@@ -2,8 +2,9 @@ extends layout
 
 block content
   div.jumbotron.my-3
-    h1.display-4 予定調整くん
+    h1.display-4 予定調整くん(test)
     p.lead 予定調整くんは、GitHubで認証でき、予定を作って出欠が取れるサービスです
+    a(href="uma.html").btn.btn-info うま
   if user
     div
       a(href="/schedules/new").btn.btn-info 予定を作る
