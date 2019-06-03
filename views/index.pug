@@ -1,9 +1,10 @@
 extends layout
 
 block content
+  div
+    img(src="uma001.JPG" alt="")
   div.jumbotron.my-3
-    h1.display-4 予定調整くん
-    img(src="/pic/uma001.JPG", alt="")
+    h1.display-4 予定調整くん(test)
     p.lead 予定調整くんは、GitHubで認証でき、予定を作って出欠が取れるサービスです
   if user
     div
