@@ -14,11 +14,12 @@ block content
       label 既存の日程候補
       ul.list-group
         each candidate in candidates
-          li.list-group-item #{candidate.candidateName}
-      label(for="candidates").my-2 候補日程の追加 (改行して複数入力してください)
-      textarea(name="candidates")#candidates.form-control
+          li.list-group-item #{candidate.formattedCandidateName}
+      label(for="candidates").my-2 候補日程の追加 (最大 3 つまで追加できます)
+      input(type="date" name="candidates")#candidates.form-control
+      button(type="button" id="addCandBtn" name="addCandidate").btn.btn-info.btn-sm.mt-2 日程をさらに追加する
     div
-      button(type="submit").btn.btn-info 以上の内容で予定を編集する
+      button(type="submit" id="editSchedBtn").btn.btn-primary 以上の内容で予定を編集する
   h3.my-3 危険な変更
   form(method="post", action=`/schedules/${schedule.scheduleId}?delete=1`)
     input(type="hidden" name="_csrf" value!=csrfToken)

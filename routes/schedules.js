@@ -10,6 +10,7 @@ const Availability = require('../models/availability');
 const Comment = require('../models/comment');
 const csrf = require('csurf');
 const csrfProtection = csrf({ cookie: true });
+const moment = require('moment-timezone');
 
 router.get('/new', authenticationEnsurer, csrfProtection, (req, res, next) => {
   res.render('new', { user: req.user, csrfToken: req.csrfToken() });
@@ -110,6 +111,9 @@ router.get('/:scheduleId', authenticationEnsurer, (req, res, next) => {
       comments.forEach((comment) => {
         commentMap.set(comment.userId, comment.comment);
       });
+      storedCandidates.forEach((storedCandidate) => {
+        storedCandidate.formattedCandidateName = moment(storedCandidate.candidateName).tz('Asia/Tokyo').format('YYYY/MM/DD');
+      });
       res.render('schedule', {
         user: req.user,
         schedule: storedSchedule,
@@ -133,6 +137,9 @@ router.get('/:scheduleId/edit', authenticationEnsurer, csrfProtection, (req, res
         where: { scheduleId: schedule.scheduleId },
         order: [['"candidateId"', 'ASC']]
       }).then((candidates) => {
+        candidates.forEach((candidate) => {
+          candidate.formattedCandidateName = moment(candidate.candidateName).tz('Asia/Tokyo').format('YYYY/MM/DD');
+      });
         res.render('edit', {
           user: req.user,
           schedule: schedule,
@@ -236,7 +243,13 @@ function createCandidatesAndRedirect(candidateNames, scheduleId, res) {
 }
 
 function parseCandidateNames(req) {
-  return req.body.candidates.trim().split('\n').map((s) => s.trim()).filter((s) => s !== "");
+  console.info('candidateNames: ' + req.body.candidates);
+  // candidateName が一つ(string)か複数(array)か判定
+  if (typeof req.body.candidates === 'string') {
+    return [req.body.candidates]; // string => array
+  } else {
+    return req.body.candidates.map((s) => s.trim()).filter((s) => s !== "");
+  }
 }
 
 module.exports = router;
