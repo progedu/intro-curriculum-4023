@@ -20,6 +20,20 @@ block content
     div
       button(type="submit").btn.btn-info 以上の内容で予定を編集する
   h3.my-3 危険な変更
-  form(method="post", action=`/schedules/${schedule.scheduleId}?delete=1`)
-    input(type="hidden" name="_csrf" value!=csrfToken)
-    button(type="submit").btn.btn-danger この予定を削除する
+  button(type="button" data-toggle="modal" data-target="#deleteModal").btn.btn-danger この予定を削除する
+  div(tabindex="-1" 
+  role="dialog" 
+  aria-labelledby="deleteModalLabel" 
+  aria-hidden="true")#deleteModal.modal.fade
+    div(role="document").modal-dialog
+      div.modal-content
+        div.modal-header
+          h5#deleteModalLabel.modal-title 削除確認
+          button(type="button" data-dismiss="modal" aria-label="Close").close
+            span(aria-hidden="true") &times;
+        div.modal-body 本当に削除しますか？
+        div.modal-footer
+          button(data-dismiss="modal").btn.btn-secondary キャンセル
+          form(method="post", action=`/schedules/${schedule.scheduleId}?delete=1`)
+            input(type="hidden" name="_csrf" value!=csrfToken)
+            button(type="submit").btn.btn-danger 削除
