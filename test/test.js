@@ -68,7 +68,7 @@ describe('/schedules', () => {
           request(app)
             .post('/schedules')
             .set('cookie', res.headers['set-cookie'])
-            .send({ scheduleName: 'テスト予定1', memo: 'テストメモ1\r\nテストメモ2', candidates: 'テスト候補1\r\nテスト候補2\r\nテスト候補3', _csrf: csrf })
+            .send({ scheduleName: 'テスト予定1', memo: 'テストメモ1\r\nテストメモ2', candidates: ['2019-09-01', '2019-10-01', '2019-11-01'], _csrf: csrf })
             .expect('Location', /schedules/)
             .expect(302)
             .end((err, res) => {
@@ -78,9 +78,9 @@ describe('/schedules', () => {
                 .expect(/テスト予定1/)
                 .expect(/テストメモ1/)
                 .expect(/テストメモ2/)
-                .expect(/テスト候補1/)
-                .expect(/テスト候補2/)
-                .expect(/テスト候補3/)
+                .expect(/2019\/09\/01/)
+                .expect(/2019\/10\/01/)
+                .expect(/2019\/11\/01/)
                 .expect(200)
                 .end((err, res) => { deleteScheduleAggregate(createdSchedulePath.split('/schedules/')[1], done, err); });
             });
@@ -107,10 +107,11 @@ describe('/schedules/:scheduleId/users/:userId/candidates/:candidateId', () => {
         .end((err, res) => {
           const match = res.text.match(/<input type="hidden" name="_csrf" value="(.*?)">/);
           const csrf = match[1];
+          
           request(app)
             .post('/schedules')
             .set('cookie', res.headers['set-cookie'])
-            .send({ scheduleName: 'テスト出欠更新予定1', memo: 'テスト出欠更新メモ1', candidates: 'テスト出欠更新候補1', _csrf: csrf })
+            .send({ scheduleName: 'テスト出欠更新予定1', memo: 'テスト出欠更新メモ1', candidates: '2019-09-01', _csrf: csrf })
             .end((err, res) => {
               const createdSchedulePath = res.headers.location;
               const scheduleId = createdSchedulePath.split('/schedules/')[1];
@@ -156,31 +157,32 @@ describe('/schedules/:scheduleId/users/:userId/comments', () => {
         .end((err, res) => {
           const match = res.text.match(/<input type="hidden" name="_csrf" value="(.*?)">/);
           const csrf = match[1];
-          request(app)
-            .post('/schedules')
-            .set('cookie', res.headers['set-cookie'])
-            .send({ scheduleName: 'テストコメント更新予定1', memo: 'テストコメント更新メモ1', candidates: 'テストコメント更新候補1', _csrf: csrf })
-            .end((err, res) => {
-              const createdSchedulePath = res.headers.location;
-              const scheduleId = createdSchedulePath.split('/schedules/')[1];
-              // 更新がされることをテスト
+
               request(app)
-                .post(`/schedules/${scheduleId}/users/${0}/comments`)
-                .send({ comment: 'testcomment' })
-                .expect('{"status":"OK","comment":"testcomment"}')
+                .post('/schedules')
+                .set('cookie', res.headers['set-cookie'])
+                .send({ scheduleName: 'テストコメント更新予定1', memo: 'テストコメント更新メモ1', candidates: '2019-09-01', _csrf: csrf })
                 .end((err, res) => {
-                  Comment.findAll({
-                    where: { scheduleId: scheduleId }
-                  }).then((comments) => {
-                    assert.equal(comments.length, 1);
-                    assert.equal(comments[0].comment, 'testcomment');
-                    deleteScheduleAggregate(scheduleId, done, err);
-                  });
+                  const createdSchedulePath = res.headers.location;
+                  const scheduleId = createdSchedulePath.split('/schedules/')[1];
+                  // 更新がされることをテスト
+                  request(app)
+                    .post(`/schedules/${scheduleId}/users/${0}/comments`)
+                    .send({ comment: 'testcomment' })
+                    .expect('{"status":"OK","comment":"testcomment"}')
+                    .end((err, res) => {
+                      Comment.findAll({
+                        where: { scheduleId: scheduleId }
+                      }).then((comments) => {
+                        assert.equal(comments.length, 1);
+                        assert.equal(comments[0].comment, 'testcomment');
+                        deleteScheduleAggregate(scheduleId, done, err);
+                      });
+                    });
                 });
             });
         });
     });
-  });
 });
 
 describe('/schedules/:scheduleId?edit=1', () => {
@@ -205,7 +207,7 @@ describe('/schedules/:scheduleId?edit=1', () => {
           request(app)
             .post('/schedules')
             .set('cookie', setCookie)
-            .send({ scheduleName: 'テスト更新予定1', memo: 'テスト更新メモ1', candidates: 'テスト更新候補1', _csrf: csrf })
+            .send({ scheduleName: 'テスト更新予定1', memo: 'テスト更新メモ1', candidates: '2019-09-01', _csrf: csrf })
             .end((err, res) => {
               const createdSchedulePath = res.headers.location;
               const scheduleId = createdSchedulePath.split('/schedules/')[1];
@@ -213,7 +215,7 @@ describe('/schedules/:scheduleId?edit=1', () => {
               request(app)
                 .post(`/schedules/${scheduleId}?edit=1`)
                 .set('cookie', setCookie)
-                .send({ scheduleName: 'テスト更新予定2', memo: 'テスト更新メモ2', candidates: 'テスト更新候補2', _csrf: csrf })
+                .send({ scheduleName: 'テスト更新予定2', memo: 'テスト更新メモ2', candidates: '2019-10-01', _csrf: csrf })
                 .end((err, res) => {
                   Schedule.findByPk(scheduleId).then((s) => {
                     assert.equal(s.scheduleName, 'テスト更新予定2');
@@ -224,8 +226,8 @@ describe('/schedules/:scheduleId?edit=1', () => {
                     order: [['"candidateId"', 'ASC']]
                   }).then((candidates) => {
                     assert.equal(candidates.length, 2);
-                    assert.equal(candidates[0].candidateName, 'テスト更新候補1');
-                    assert.equal(candidates[1].candidateName, 'テスト更新候補2');
+                    assert.equal(candidates[0].candidateName, '2019-09-01');
+                    assert.equal(candidates[1].candidateName, '2019-10-01');
                     deleteScheduleAggregate(scheduleId, done, err);
                   });
                 });
@@ -257,7 +259,7 @@ describe('/schedules/:scheduleId?delete=1', () => {
           request(app)
             .post('/schedules')
             .set('cookie', setCookie)
-            .send({ scheduleName: 'テスト更新予定1', memo: 'テスト更新メモ1', candidates: 'テスト更新候補1', _csrf: csrf })
+            .send({ scheduleName: 'テスト更新予定1', memo: 'テスト更新メモ1', candidates: '2019-09-01', _csrf: csrf })
             .end((err, res) => {
               const createdSchedulePath = res.headers.location;
               const scheduleId = createdSchedulePath.split('/schedules/')[1];
