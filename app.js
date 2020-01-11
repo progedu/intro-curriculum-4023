@@ -24,6 +24,7 @@ User.sync().then(() => {
   });
 });
 
+Schedule.belongsTo(Candidate,{foreignKey: 'candidateId'});
 
 var GitHubStrategy = require('passport-github2').Strategy;
 var GITHUB_CLIENT_ID = process.env.GITHUB_CLIENT_ID || '2f831cb3d4aac02393aa';

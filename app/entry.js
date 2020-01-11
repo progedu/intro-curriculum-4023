@@ -22,6 +22,10 @@ $('.availability-toggle-button').each((i, e) => {
         const buttonStyles = ['btn-danger', 'btn-secondary', 'btn-success'];
         button.removeClass('btn-danger btn-secondary btn-success');
         button.addClass(buttonStyles[data.availability]);
+
+        //人候補日にカラーを付与(以前のカラーは消す)
+        $('tr').removeClass('table-info');
+        $(`#${data.topCandidateId}`).addClass('table-info');
       });
   });
 });

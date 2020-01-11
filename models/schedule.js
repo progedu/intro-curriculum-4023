@@ -23,7 +23,11 @@ const Schedule = loader.database.define('schedules', {
   updatedAt: {
     type: Sequelize.DATE,
     allowNull: false
-  }
+  },
+  candidateId:{ // 暫定の候補日
+    type: Sequelize.INTEGER,
+    allowNull: true
+    }
 }, {
     freezeTableName: true,
     timestamps: false,
