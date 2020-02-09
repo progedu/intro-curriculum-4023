@@ -35,6 +35,7 @@ describe('/login', () => {
       .expect(/testuser/)
       .expect(200, done);
   });
+
 });
 
 describe('/logout', () => {
@@ -121,7 +122,7 @@ describe('/schedules/:scheduleId/users/:userId/candidates/:candidateId', () => {
                 request(app)
                   .post(`/schedules/${scheduleId}/users/${0}/candidates/${candidate.candidateId}`)
                   .send({ availability: 2 }) // 出席に更新
-                  .expect('{"status":"OK","availability":2}')
+                  .expect(/{"status":"OK","availability":2,"topCandidateId":(.*)}/)
                   .end((err, res) => {
                     Availability.findAll({
                       where: { scheduleId: scheduleId }
@@ -136,7 +137,88 @@ describe('/schedules/:scheduleId/users/:userId/candidates/:candidateId', () => {
         });
     });
   });
+
+  it('出欠の更新で、人気の候補日をハイライトできる', (done) => {
+    User.upsert({ userId: 0, username: 'testuser' }).then(() => {
+      request(app)
+        .get('/schedules/new')
+        .end((err, res) => {
+          const match = res.text.match(/<input type="hidden" name="_csrf" value="(.*?)">/);
+          const csrf = match[1];
+          request(app)
+            .post('/schedules')
+            .set('cookie', res.headers['set-cookie'])
+            .send({ scheduleName: 'テスト出欠更新予定1', memo: 'テスト出欠更新メモ1', candidates: 'テスト出欠更新候補1', _csrf: csrf })
+            .end((err, res) => {
+              const createdSchedulePath = res.headers.location;
+              const scheduleId = createdSchedulePath.split('/schedules/')[1];
+              Candidate.findOne({
+                where: { scheduleId: scheduleId }
+              }).then((candidate) => {
+                // 更新がされることをテスト
+                request(app)
+                  .post(`/schedules/${scheduleId}/users/${0}/candidates/${candidate.candidateId}`)
+                  .send({ availability: 2 }) // 出席に更新
+                  .expect(/{"status":"OK","availability":2,"topCandidateId":(.*)}/)
+                  .end((err, res) => {
+                    Availability.findAll({
+                      where: { scheduleId: scheduleId }
+                    }).then((availabilities) => {
+                      assert.equal(availabilities.length, 1);
+                      assert.equal(availabilities[0].availability, 2);
+                    }).then(() => {
+                      request(app)
+                        .get(`/schedules/${scheduleId}`)
+                        .expect(/table-info/)
+                        .end((err, res) => {
+                          deleteScheduleAggregate(scheduleId, done, err);
+                        });
+                    });
+                  });
+              });
+            });
+        });
+    });
+  });
+
+
+  it('出欠の更新で、トップページに人気の候補日を表示できる', (done) => {
+    User.upsert({ userId: 0, username: 'testuser' }).then(() => {
+      request(app)
+        .get('/schedules/new')
+        .end((err, res) => {
+          const match = res.text.match(/<input type="hidden" name="_csrf" value="(.*?)">/);
+          const csrf = match[1];
+          request(app)
+            .post('/schedules')
+            .set('cookie', res.headers['set-cookie'])
+            .send({ scheduleName: 'テスト出欠更新予定1', memo: 'テスト出欠更新メモ1', candidates: 'テスト出欠更新候補1', _csrf: csrf })
+            .end((err, res) => {
+              const createdSchedulePath = res.headers.location;
+              const scheduleId = createdSchedulePath.split('/schedules/')[1];
+              Candidate.findOne({
+                where: { scheduleId: scheduleId }
+              }).then((candidate) => {
+                // 更新がされることをテスト
+                request(app)
+                  .post(`/schedules/${scheduleId}/users/${0}/candidates/${candidate.candidateId}`)
+                  .send({ availability: 2 }) // 出席に更新
+                  .expect(/{"status":"OK","availability":2,"topCandidateId":(.*)}/)
+                  .end((err, res) => {
+                    request(app)
+                      .get('/')
+                      .expect(/テスト出欠更新候補1/)
+                      .end((err, res) => {
+                        deleteScheduleAggregate(scheduleId, done, err);
+                      });
+                  });
+              });
+            });
+        });
+    });
+  });
 });
+
 
 describe('/schedules/:scheduleId/users/:userId/comments', () => {
   before(() => {

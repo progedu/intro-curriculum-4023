@@ -13,9 +13,14 @@ block content
       table.table
         tr
           th 予定名
+          th 今のベスト日程
           th 更新日時
         each schedule in schedules
           tr
             td
               a(href=`/schedules/${schedule.scheduleId}`) #{schedule.scheduleName}
+            if (schedule.candidate != null)
+              td #{schedule.candidate.candidateName}
+            else
+              td 未決定
             td #{schedule.formattedUpdatedAt}

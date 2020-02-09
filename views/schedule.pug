@@ -14,12 +14,15 @@ block content
       a(href=`/schedules/${schedule.scheduleId}/edit`).btn.btn-info この予定を編集する
   h3.my-3 出欠表
   table.table.table-bordered
-    tr
+    tr.thead-light
       th 予定
       each user in users
         th #{user.username}
     each candidate in candidates
-      tr
+      - var tableColorClass = ''
+      if candidate.candidateId === topCandidateId
+        - tableColorClass = "table-info"
+      tr(id=`${candidate.candidateId}` class=`${tableColorClass}`)
         th #{candidate.candidateName}
         each user in users
           - var availability = availabilityMapMap.get(user.userId).get(candidate.candidateId)

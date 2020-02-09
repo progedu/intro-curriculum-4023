@@ -1,6 +1,7 @@
 'use strict';
 const express = require('express');
 const router = express.Router();
+const sequelize = require('../models/sequelize-loader').database;
 const authenticationEnsurer = require('./authentication-ensurer');
 const uuid = require('uuid');
 const Schedule = require('../models/schedule');
@@ -23,7 +24,8 @@ router.post('/', authenticationEnsurer, csrfProtection, (req, res, next) => {
     scheduleName: req.body.scheduleName.slice(0, 255) || '（名称未設定）',
     memo: req.body.memo,
     createdBy: req.user.id,
-    updatedAt: updatedAt
+    updatedAt: updatedAt,
+    candidateId: 0 // 候補なし
   }).then((schedule) => {
     createCandidatesAndRedirect(parseCandidateNames(req), scheduleId, res);
   });
@@ -102,21 +104,37 @@ router.get('/:scheduleId', authenticationEnsurer, (req, res, next) => {
       });
     });
 
-    // コメント取得
-    return Comment.findAll({
-      where: { scheduleId: storedSchedule.scheduleId }
-    }).then((comments) => {
-      const commentMap = new Map();  // key: userId, value: comment
-      comments.forEach((comment) => {
-        commentMap.set(comment.userId, comment.comment);
-      });
-      res.render('schedule', {
-        user: req.user,
-        schedule: storedSchedule,
-        candidates: storedCandidates,
-        users: users,
-        availabilityMapMap: availabilityMapMap,
-        commentMap: commentMap
+    // 候補ごとの合算値を出して、最大値となるものを出席率が高い候補日として算出する
+    // 複数ある場合はより上位のものが優先される
+    return Availability.findOne({
+      attributes: [
+        'candidateId'
+      ],
+      where: {
+        scheduleId: req.params.scheduleId
+      },
+      group: ['candidateId'],
+      order: [[sequelize.fn('SUM', sequelize.col('availability')), 'DESC']]
+    }).then((topCandidate) => {
+      let topCandidateId = 0;
+      if (topCandidate != null) topCandidateId = topCandidate.candidateId;
+      // コメント取得
+      return Comment.findAll({
+        where: { scheduleId: storedSchedule.scheduleId }
+      }).then((comments) => {
+        const commentMap = new Map();  // key: userId, value: comment
+        comments.forEach((comment) => {
+          commentMap.set(comment.userId, comment.comment);
+        });
+        res.render('schedule', {
+          user: req.user,
+          schedule: storedSchedule,
+          candidates: storedCandidates,
+          users: users,
+          availabilityMapMap: availabilityMapMap,
+          commentMap: commentMap,
+          topCandidateId: topCandidateId
+        });
       });
     });
   });
