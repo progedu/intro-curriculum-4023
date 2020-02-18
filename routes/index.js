@@ -14,8 +14,12 @@ router.get('/', (req, res, next) => {
       },
       order: [['"updatedAt"', 'DESC']]
     }).then((schedules) => {
+      const oneHourAgo = Date.now() - 3600000;
       schedules.forEach((schedule) => {
         schedule.formattedUpdatedAt = moment(schedule.updatedAt).tz('Asia/Tokyo').format('YYYY/MM/DD HH:mm');
+        if (schedule.updatedAt.getTime() > oneHourAgo) {
+          schedule.scheduleName = '[new]' + schedule.scheduleName;
+        }
       });
       res.render('index', {
         title: title,
