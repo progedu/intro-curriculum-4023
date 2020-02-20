@@ -29,6 +29,14 @@ var GitHubStrategy = require('passport-github2').Strategy;
 var GITHUB_CLIENT_ID = process.env.GITHUB_CLIENT_ID || '2f831cb3d4aac02393aa';
 var GITHUB_CLIENT_SECRET = process.env.GITHUB_CLIENT_SECRET || '9fbc340ac0175123695d2dedfbdf5a78df3b8067';
 
+var FacebookStrategy = require('passport-facebook').Strategy;
+var FACEBOOK_APP_ID = process.env.FACEBOOK_APP_ID || '127348745284840';
+var FACEBOOK_APP_SECRET = process.env.FACEBOOK_APP_SECRET || '5fd41ca997afaf9c8aba65d84209b4c0';
+
+var TwitterStrategy = require('passport-twitter').Strategy;
+var TWITTER_CONSUMER_KYE = process.env.TWITTER_CONSUMER_KYE || 'oAUezvNIErQYQFpSBkjOoFuQQ';
+var TWITTER_CONSUMER_SECRET = process.env.TWITTER_CONSUMER_SECRET || 'pulK5fSrmtEDa4CxaxvwXuSmnnXczTc1kqiBxWm56KPw6OSg2O';
+
 passport.serializeUser(function (user, done) {
   done(null, user);
 });
@@ -44,6 +52,40 @@ passport.use(new GitHubStrategy({
   callbackURL: process.env.HEROKU_URL ? process.env.HEROKU_URL + 'auth/github/callback' : 'http://localhost:8000/auth/github/callback'
 },
   function (accessToken, refreshToken, profile, done) {
+    process.nextTick(function () {
+      User.upsert({
+        userId: profile.id,
+        username: profile.username
+      }).then(() => {
+        done(null, profile);
+      });
+    });
+  }
+));
+
+passport.use(new FacebookStrategy({
+  clientID: FACEBOOK_APP_ID,
+  clientSecret: FACEBOOK_APP_SECRET,
+  callbackURL: process.env.HEROKU_URL ? process.env.HEROKU_URL + 'auth/facebook/callback' : 'http://localhost:8000/auth/facebook/callback'
+},
+  function(accessToken, refreshToken, profile, done){
+    process.nextTick(function () {
+      User.upsert({
+        userId: profile.id,
+        username: profile.username
+      }).then(() => {
+        done(null, profile);
+      });
+    });
+  }
+));
+
+passport.use(new TwitterStrategy({
+  consumerKey: TWITTER_CONSUMER_KYE,
+  consumerSecret: TWITTER_CONSUMER_SECRET,
+  callbackURL: process.env.HEROKU_URL ? process.env.HEROKU_URL + 'auth/twitter/callback' : 'http://localhost:8000/auth/twitter/callback'
+},
+  function(token, tokenSecret, profile, done) {
     process.nextTick(function () {
       User.upsert({
         userId: profile.id,
@@ -103,6 +145,46 @@ app.get('/auth/github/callback',
       res.redirect(loginFrom);
     } else {
       res.redirect('/');
+    }
+  });
+
+app.get('/auth/facebook',
+  passport.authenticate('facebook', { scope: ['user:email'] }),
+  function(req, res) {
+  });
+
+app.get('/auth/facebook/callback',
+  passport.authenticate('facebook', { failureRedirect: '/login' }),
+  function (req, res) {
+    var loginFrom = req.cookies.loginFrom;
+    // オープンリダイレクタ脆弱性対策
+    if (loginFrom &&
+      !loginFrom.includes('http://') &&
+      !loginFrom.includes('https://')) {
+      res.clearCookie('loginForm');
+      res.redirect(loginFrom);
+    } else {
+      res.redirect('/');
+    }
+  });
+
+  app.get('/auth/twitter',
+    passport.authenticate('twitter', { scope: ['user:email'] }),
+    function (req, res){
+  });
+
+  app.get('/auth/twitter/callback',
+    passport.authenticate('twitter', { failureRedirect: '/login' }),
+    function(req, res) {
+      var loginFrom = req.cookies.loginFrom;
+      // オープンリダイレクタ脆弱性対策
+      if (loginFrom &&
+        !loginFrom.includes('http://') &&
+        !loginFrom.includes('https://')) {
+        res.clearCookie('loginForm');
+        res.redirect(loginFrom);
+      } else {
+        res.redirect('/');
     }
   });
 
