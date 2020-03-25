@@ -39,3 +39,12 @@ buttonSelfComment.click(() => {
       });
   }
 });
+
+const deleteSchedule = $('#delete-schedule-form');
+deleteSchedule.submit(() => {
+  if (window.confirm('本当に削除しますか？')) {
+    return true;
+  } else {
+    return false;
+  }
+});

@@ -3,7 +3,7 @@ const express = require('express');
 const router = express.Router();
 const fs = require('fs');
 
-router.get('/', (req, res, next) => {
+router.get('/favicon.ico', (req, res, next) => {
   res.writeHead(200, {
     'Content-Type': 'image/vnd.microsoft.icon'
   });
