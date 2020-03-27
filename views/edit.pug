@@ -1,5 +1,11 @@
 extends layout
 
+block append head
+  link(rel="stylesheet",
+  href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker.min.css",
+  integrity="sha256-siyOpF/pBWUPgIcQi17TLBkjvNgNQArcmwJB8YvkAgg=",
+  crossorigin="anonymous")
+
 block content
   h3.my-3 予定の編集
   form(method="post", action=`/schedules/${schedule.scheduleId}?edit=1`)
@@ -15,8 +21,8 @@ block content
       ul.list-group
         each candidate in candidates
           li.list-group-item #{candidate.candidateName}
-      label(for="candidates").my-2 候補日程の追加 (改行して複数入力してください)
-      textarea(name="candidates")#candidates.form-control
+      label(for="candidates").my-2 候補日程の追加
+      input(name="candidates")#candidates.form-control
     div
       button(type="submit").btn.btn-info 以上の内容で予定を編集する
   h3.my-3 危険な変更

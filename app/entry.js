@@ -3,6 +3,7 @@ import $ from 'jquery';
 const global = Function('return this;')();
 global.jQuery = $;
 import bootstrap from 'bootstrap';
+import bootstrapDatepicker from 'bootstrap-datepicker';
 
 $('.availability-toggle-button').each((i, e) => {
   const button = $(e);
@@ -40,6 +41,7 @@ buttonSelfComment.click(() => {
   }
 });
 
+// 予定の削除時に確認
 const deleteSchedule = $('#delete-schedule-form');
 deleteSchedule.submit(() => {
   if (window.confirm('本当に削除しますか？')) {
@@ -47,4 +49,21 @@ deleteSchedule.submit(() => {
   } else {
     return false;
   }
+});
+
+// bootstrap-datepicker
+$.fn.datepicker.dates['ja'] = {
+  days: ["日曜日", "月曜日", "日曜日", "水曜日", "木曜日", "金曜日", "土曜日"],
+  daysShort: ["日", "月", "日", "水", "木", "金", "土"],
+  daysMin: ["日", "月", "日", "水", "木", "金", "土"],
+  months: ["1月", "2月", "3月", "4月", "5月", "6月", "7月", "8月", "9月", "10月", "11月", "12月"],
+  monthsShort: ["1月", "2月", "3月", "4月", "5月", "6月", "7月", "8月", "9月", "10月", "11月", "12月"],
+};
+
+$('#candidates').datepicker({
+  format: "yyyy/mm//dd",
+  startDate: "new Date()",
+  language: "ja",
+  multidate: true,
+  multidateSeparator: ", "
 });
