@@ -60,10 +60,13 @@ $.fn.datepicker.dates['ja'] = {
   monthsShort: ["1月", "2月", "3月", "4月", "5月", "6月", "7月", "8月", "9月", "10月", "11月", "12月"],
 };
 
+const datesDisabledList = $('li.list-group-item').toArray().map((l) => l.innerText);
+
 $('#candidates').datepicker({
-  format: "yyyy/mm//dd",
+  format: "yyyy/mm/dd",
   startDate: "new Date()",
   language: "ja",
   multidate: true,
-  multidateSeparator: ", "
+  multidateSeparator: ", ",
+  datesDisabled: datesDisabledList
 });

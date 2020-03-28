@@ -154,12 +154,16 @@ jquery__WEBPACK_IMPORTED_MODULE_0___default.a.fn.datepicker.dates['ja'] = {
   months: ["1月", "2月", "3月", "4月", "5月", "6月", "7月", "8月", "9月", "10月", "11月", "12月"],
   monthsShort: ["1月", "2月", "3月", "4月", "5月", "6月", "7月", "8月", "9月", "10月", "11月", "12月"]
 };
+var datesDisabledList = jquery__WEBPACK_IMPORTED_MODULE_0___default()('li.list-group-item').toArray().map(function (l) {
+  return l.innerText;
+});
 jquery__WEBPACK_IMPORTED_MODULE_0___default()('#candidates').datepicker({
-  format: "yyyy/mm//dd",
+  format: "yyyy/mm/dd",
   startDate: "new Date()",
   language: "ja",
   multidate: true,
-  multidateSeparator: ", "
+  multidateSeparator: ", ",
+  datesDisabled: datesDisabledList
 });
 
 /***/ }),
