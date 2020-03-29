@@ -1,4 +1,9 @@
 extends layout
 
 block content
-  a(href="/auth/github").btn.btn-info.my-3 GitHubでログイン
+  div.container
+    //- img(src="/public/logo.png", alt="logo" height="100px" width="100px")
+    form.form-signin
+      h1.mb-3.font-weight-normal Please sign in!
+      a(href="/auth/github").btn.btn-lg.my-3.btn-primary.btn-block GitHubでログイン
+
