@@ -164,6 +164,20 @@ jquery__WEBPACK_IMPORTED_MODULE_0___default()('#candidates').datepicker({
   multidate: true,
   multidateSeparator: ", ",
   datesDisabled: datesDisabledList
+}); // 空欄で送信できないように validation
+
+jquery__WEBPACK_IMPORTED_MODULE_0___default()(window).on('load', function () {
+  var forms = jquery__WEBPACK_IMPORTED_MODULE_0___default()('.needs-validation');
+  var validation = forms.each(function (i, form) {
+    jquery__WEBPACK_IMPORTED_MODULE_0___default()(form).on('submit', function (e) {
+      if (jquery__WEBPACK_IMPORTED_MODULE_0___default()(form)[0].checkValidity() === false) {
+        e.preventDefault();
+        e.stopPropagation();
+      }
+
+      jquery__WEBPACK_IMPORTED_MODULE_0___default()(form).addClass('was-validated');
+    });
+  });
 });
 
 /***/ }),

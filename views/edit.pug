@@ -8,11 +8,12 @@ block append head
 
 block content
   h3.my-3 予定の編集
-  form(method="post", action=`/schedules/${schedule.scheduleId}?edit=1`)
+  form(method="post", action=`/schedules/${schedule.scheduleId}?edit=1`, novalidate).needs-validation
     input(type="hidden" name="_csrf" value!=csrfToken)
     div.form-group
       label(for="scheduleName") 予定名
-      input(type="text" name="scheduleName" value=schedule.scheduleName)#scheduleName.form-control
+      input(type="text" name="scheduleName" value=schedule.scheduleName required)#scheduleName.form-control
+      div.invalid-feedback 予定名を入力してください
     div.form-group
       label(for="memo") メモ
       textarea(name="memo")#memo.form-control #{schedule.memo}

@@ -24,7 +24,7 @@ block content
         th #{user.username}
     each candidate in candidates
       tr
-        td #{candidate.candidateName}
+        th #{candidate.candidateName}
         each user in users
           - var availability = availabilityMapMap.get(user.userId).get(candidate.candidateId)
           - var availabilityLabels = ['欠', '？', '出'];

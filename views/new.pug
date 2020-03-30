@@ -7,15 +7,17 @@ block append head
   crossorigin="anonymous")
 
 block content
-  form(method="post", action="/schedules").my-3
+  form(method="post", action="/schedules", novalidate).my-3.needs-validation
     input(type="hidden" name="_csrf" value!=csrfToken)
     div.form-group
       label(for="scheduleName") 予定名
-      input(type="text" name="scheduleName")#scheduleName.form-control
+      input(type="text" name="scheduleName" required)#scheduleName.form-control
+      div.invalid-feedback 予定名を入力してください
     div.form-group
       label(for="memo") メモ
       textarea(name="memo")#memo.form-control
     div.form-group
       label(for="candidates") 候補日程
-      input(type="text" name="candidates" rows="4")#candidates.form-control
+      input(type="text" name="candidates" rows="4" required)#candidates.form-control
+      div.invalid-feedback 候補日を選択してください
     button(type="submit").btn.btn-info 予定をつくる

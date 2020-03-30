@@ -70,3 +70,17 @@ $('#candidates').datepicker({
   multidateSeparator: ", ",
   datesDisabled: datesDisabledList
 });
+
+// 空欄で送信できないように validation
+$(window).on('load', () => {
+  const forms = $('.needs-validation');
+  const validation = forms.each((i, form) => {
+    $(form).on('submit', (e) => {
+      if ($(form)[0].checkValidity() === false) {
+        e.preventDefault();
+        e.stopPropagation();
+      }
+      $(form).addClass('was-validated');
+    });
+  });
+});
