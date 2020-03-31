@@ -2,11 +2,11 @@ extends layout
 
 block content
   div.card.my-3
-    div.panel-header
+    div.card-header
       h4 #{schedule.scheduleName}
-    div.panel-body
+    div.card-body
       p(style="white-space:pre;") #{schedule.memo}
-    div.panel-footer
+    div.card-footer
       p 作成者: #{schedule.user.username}
   div.form-group
     label(for="shareURL") 共有用 URL:
