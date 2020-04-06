@@ -64,12 +64,26 @@ const datesDisabledList = $('li.list-group-item').toArray().map((l) => l.innerTe
 
 $('#candidates').datepicker({
   format: "yyyy/mm/dd",
-  startDate: "new Date()",
+  startDate: "today",
   language: "ja",
   multidate: true,
-  multidateSeparator: ", ",
+  multidateSeparator: ",",
   datesDisabled: datesDisabledList
-});
+}).on('hide', sortDates);
+
+function sortDates(e) {
+  const sortedDates = e.target.value.split(',').sort((a, b) => {
+    if (new Date(a) < new Date(b)) {
+      return -1;
+    } else if (new Date(a) > new Date(b)) {
+      return 1;
+    } else {
+      return 0;
+    }
+  });
+  // input欄で見やすいようにスペース追加
+  e.target.value = sortedDates.join(', ');
+}
 
 // 空欄で送信できないように validation
 $(window).on('load', () => {

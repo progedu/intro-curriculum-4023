@@ -159,12 +159,27 @@ var datesDisabledList = jquery__WEBPACK_IMPORTED_MODULE_0___default()('li.list-g
 });
 jquery__WEBPACK_IMPORTED_MODULE_0___default()('#candidates').datepicker({
   format: "yyyy/mm/dd",
-  startDate: "new Date()",
+  startDate: "today",
   language: "ja",
   multidate: true,
-  multidateSeparator: ", ",
+  multidateSeparator: ",",
   datesDisabled: datesDisabledList
-}); // 空欄で送信できないように validation
+}).on('hide', sortDates);
+
+function sortDates(e) {
+  var sortedDates = e.target.value.split(',').sort(function (a, b) {
+    if (new Date(a) < new Date(b)) {
+      return -1;
+    } else if (new Date(a) > new Date(b)) {
+      return 1;
+    } else {
+      return 0;
+    }
+  }); // input欄で見やすいようにスペース追加
+
+  e.target.value = sortedDates.join(', ');
+} // 空欄で送信できないように validation
+
 
 jquery__WEBPACK_IMPORTED_MODULE_0___default()(window).on('load', function () {
   var forms = jquery__WEBPACK_IMPORTED_MODULE_0___default()('.needs-validation');
