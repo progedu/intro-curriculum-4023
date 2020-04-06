@@ -22,6 +22,8 @@ block content
       th 予定
       each user in users
         th #{user.username}
+    - var orderByCandidateName = candidates.sort((a, b) => new Date(a.candidateName) - new Date(b.candidateName));
+    - orderByCandidateName = candidates;
     each candidate in candidates
       tr
         th #{candidate.candidateName}

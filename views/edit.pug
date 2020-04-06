@@ -20,6 +20,8 @@ block content
     div.form-group
       label 既存の日程候補
       ul.list-group
+        - var orderByCandidateName = candidates.sort((a, b) => new Date(a.candidateName) - new Date(b.candidateName));
+        - orderByCandidateName = candidates;
         each candidate in candidates
           li.list-group-item #{candidate.candidateName}
       label(for="candidates").my-2 候補日程の追加
