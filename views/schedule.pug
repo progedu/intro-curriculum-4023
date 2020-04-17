@@ -24,16 +24,16 @@ block content
         each user in users
           - var availability = availabilityMapMap.get(user.userId).get(candidate.candidateId)
           - var availabilityLabels = ['欠', '？', '出'];
-          - var buttonStyles = ['btn-danger', 'btn-secondary', 'btn-success'];
+          - var buttonStyles = ['danger', 'secondary', 'success'];
           td
             if user.isSelf
-              button(class=`availability-toggle-button btn-lg ${buttonStyles[availability]}`
+              button(class=`availability-toggle-button btn-lg btn-${buttonStyles[availability]}`
                 data-schedule-id=schedule.scheduleId
                 data-user-id=user.userId
                 data-candidate-id=candidate.candidateId
                 data-availability=availability) #{availabilityLabels[availability]}
             else
-              h3 #{availabilityLabels[availability]}
+              button(class=`btn-lg btn-outline-${buttonStyles[availability]} disabled`) #{availabilityLabels[availability]}
     tr
       th コメント
       each user in users
