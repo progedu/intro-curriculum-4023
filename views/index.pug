@@ -7,15 +7,30 @@ block content
   if user
     div
       a(href="/schedules/new").btn.btn-info 予定を作る
-    - var hasSchedule = schedules.length > 0
-    if hasSchedule
+    - var mySchedules = schedules.filter(s => s.createdBy === parseInt(user.id))
+    - var othersSchedules = schedules.filter(s => s.createdBy !== parseInt(user.id))
+    if mySchedules.length > 0
       h3.my-3 あなたの作った予定一覧
       table.table
         tr
           th 予定名
           th 更新日時
-        each schedule in schedules
+        each schedule in mySchedules
           tr
             td
               a(href=`/schedules/${schedule.scheduleId}`) #{schedule.scheduleName}
+            td #{schedule.formattedUpdatedAt}
+
+    if othersSchedules.length > 0
+      h3.my-3 他の人が作った予定一覧(出欠入力済のもの)
+      table.table
+        tr
+          th 予定名
+          th 作成者
+          th 更新日時
+        each schedule in othersSchedules
+          tr
+            td
+              a(href=`/schedules/${schedule.scheduleId}`) #{schedule.scheduleName}
+            td #{schedule.user.username}
             td #{schedule.formattedUpdatedAt}
