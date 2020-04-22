@@ -11,53 +11,53 @@ const Comment = require('../models/comment');
 const deleteScheduleAggregate = require('../routes/schedules').deleteScheduleAggregate;
 
 describe('/login', () => {
-  before(() => {
+  beforeAll(() => {
     passportStub.install(app);
     passportStub.login({ username: 'testuser' });
   });
 
-  after(() => {
+  afterAll(() => {
     passportStub.logout();
     passportStub.uninstall(app);
   });
 
-  it('ログインのためのリンクが含まれる', (done) => {
-    request(app)
+  test('ログインのためのリンクが含まれる', () => {
+    return request(app)
       .get('/login')
       .expect('Content-Type', 'text/html; charset=utf-8')
       .expect(/<a class="btn btn-info my-3" href="\/auth\/github"/)
-      .expect(200, done);
+      .expect(200);
   });
 
-  it('ログイン時はユーザー名が表示される', (done) => {
-    request(app)
+  test('ログイン時はユーザー名が表示される', (done) => {
+    return request(app)
       .get('/')
       .expect(/testuser/)
-      .expect(200, done);
+      .expect(200);
   });
 });
 
 describe('/logout', () => {
-  it('/ にリダイレクトされる', (done) => {
-    request(app)
+  test('/ にリダイレクトされる', () => {
+    return request(app)
       .get('/logout')
       .expect('Location', '/')
-      .expect(302, done);
+      .expect(302);
   });
 });
 
 describe('/schedules', () => {
-  before(() => {
+  beforeAll(() => {
     passportStub.install(app);
     passportStub.login({ id: 0, username: 'testuser' });
   });
 
-  after(() => {
+  afterAll(() => {
     passportStub.logout();
     passportStub.uninstall(app);
   });
 
-  it('予定が作成でき、表示される', (done) => {
+  test('予定が作成でき、表示される', (done) => {
     User.upsert({ userId: 0, username: 'testuser' }).then(() => {
       request(app)
         .get('/schedules/new')
@@ -90,17 +90,17 @@ describe('/schedules', () => {
 });
 
 describe('/schedules/:scheduleId/users/:userId/candidates/:candidateId', () => {
-  before(() => {
+  beforeAll(() => {
     passportStub.install(app);
     passportStub.login({ id: 0, username: 'testuser' });
   });
 
-  after(() => {
+  afterAll(() => {
     passportStub.logout();
     passportStub.uninstall(app);
   });
 
-  it('出欠が更新できる', (done) => {
+  test('出欠が更新できる', (done) => {
     User.upsert({ userId: 0, username: 'testuser' }).then(() => {
       request(app)
         .get('/schedules/new')
@@ -139,17 +139,17 @@ describe('/schedules/:scheduleId/users/:userId/candidates/:candidateId', () => {
 });
 
 describe('/schedules/:scheduleId/users/:userId/comments', () => {
-  before(() => {
+  beforeAll(() => {
     passportStub.install(app);
     passportStub.login({ id: 0, username: 'testuser' });
   });
 
-  after(() => {
+  afterAll(() => {
     passportStub.logout();
     passportStub.uninstall(app);
   });
 
-  it('コメントが更新できる', (done) => {
+  test('コメントが更新できる', (done) => {
     User.upsert({ userId: 0, username: 'testuser' }).then(() => {
       request(app)
         .get('/schedules/new')
@@ -184,17 +184,17 @@ describe('/schedules/:scheduleId/users/:userId/comments', () => {
 });
 
 describe('/schedules/:scheduleId?edit=1', () => {
-  before(() => {
+  beforeAll(() => {
     passportStub.install(app);
     passportStub.login({ id: 0, username: 'testuser' });
   });
 
-  after(() => {
+  afterAll(() => {
     passportStub.logout();
     passportStub.uninstall(app);
   });
 
-  it('予定が更新でき、候補が追加できる', (done) => {
+  test('予定が更新でき、候補が追加できる', (done) => {
     User.upsert({ userId: 0, username: 'testuser' }).then(() => {
       request(app)
         .get('/schedules/new')
@@ -236,17 +236,17 @@ describe('/schedules/:scheduleId?edit=1', () => {
 });
 
 describe('/schedules/:scheduleId?delete=1', () => {
-  before(() => {
+  beforeAll(() => {
     passportStub.install(app);
     passportStub.login({ id: 0, username: 'testuser' });
   });
 
-  after(() => {
+  afterAll(() => {
     passportStub.logout();
     passportStub.uninstall(app);
   });
 
-  it('予定に関連する全ての情報が削除できる', (done) => {
+  test('予定に関連する全ての情報が削除できる', (done) => {
     User.upsert({ userId: 0, username: 'testuser' }).then(() => {
       request(app)
         .get('/schedules/new')
