@@ -23,15 +23,15 @@ block content
         th #{user.username}
     each candidate in candidates
       tr
+        - var availabilityNum = availabilitiesNumMap.get(candidate.candidateId)
         th #{candidate.candidateName}
+        td #{availabilityNum[2]}
+        td #{availabilityNum[1]}
+        td #{availabilityNum[0]}
         each user in users
           - var availability = availabilityMapMap.get(user.userId).get(candidate.candidateId)
-          - var availabilityNum = availabilitiesNumMap.get(candidate.candidateId)
           - var availabilityLabels = ['欠', '？', '出'];
           - var buttonStyles = ['btn-danger', 'btn-secondary', 'btn-success'];
-          td #{availabilityNum[2]}
-          td #{availabilityNum[1]}
-          td #{availabilityNum[0]}
           td
             if user.isSelf
               button(class=`availability-toggle-button btn-lg ${buttonStyles[availability]}`

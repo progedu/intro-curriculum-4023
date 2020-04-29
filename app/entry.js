@@ -22,6 +22,30 @@ $('.availability-toggle-button').each((i, e) => {
         const buttonStyles = ['btn-danger', 'btn-secondary', 'btn-success'];
         button.removeClass('btn-danger btn-secondary btn-success');
         button.addClass(buttonStyles[data.availability]);
+
+        // 出欠ボタンを押すごとに集計結果を更新する
+        button.parent().parent().find('td').each((i, f) => {
+          let availabilitesNum = $(f);
+          let beforedata = data.availability - 1;
+          if (beforedata === -1) {
+            beforedata = 0;
+          } else if (beforedata === 0) {
+            beforedata = 2;
+          }
+
+          let afterdata = data.availability;
+          if (data.availability === 0) {
+            afterdata = 2;
+          } else if (data.availability === 2) {
+            afterdata = 0;
+          }
+
+          if (i === afterdata) {
+            availabilitesNum.text(Number(availabilitesNum.text()) + 1);
+          } else if (i === beforedata) {
+            availabilitesNum.text(Number(availabilitesNum.text()) - 1);
+          }
+        }); 
       });
   });
 });
