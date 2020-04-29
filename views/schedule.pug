@@ -16,6 +16,9 @@ block content
   table.table.table-bordered
     tr
       th 予定
+      th 出
+      th ？
+      th 欠
       each user in users
         th #{user.username}
     each candidate in candidates
@@ -23,8 +26,12 @@ block content
         th #{candidate.candidateName}
         each user in users
           - var availability = availabilityMapMap.get(user.userId).get(candidate.candidateId)
+          - var availabilityNum = availabilitiesNumMap.get(candidate.candidateId)
           - var availabilityLabels = ['欠', '？', '出'];
           - var buttonStyles = ['btn-danger', 'btn-secondary', 'btn-success'];
+          td #{availabilityNum[2]}
+          td #{availabilityNum[1]}
+          td #{availabilityNum[0]}
           td
             if user.isSelf
               button(class=`availability-toggle-button btn-lg ${buttonStyles[availability]}`
@@ -36,6 +43,9 @@ block content
               h3 #{availabilityLabels[availability]}
     tr
       th コメント
+      td
+      td
+      td
       each user in users
         if user.isSelf
           td

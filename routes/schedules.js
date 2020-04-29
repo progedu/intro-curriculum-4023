@@ -91,6 +91,7 @@ router.get('/:scheduleId', authenticationEnsurer, (req, res, next) => {
       });
     });
 
+    let availabilitiesNumMap = new Map();
     // 全ユーザー、全候補で二重ループしてそれぞれの出欠の値がない場合には、「欠席」を設定する
     const users = Array.from(userMap).map((keyValue) => keyValue[1]);
     users.forEach((u) => {
@@ -99,6 +100,16 @@ router.get('/:scheduleId', authenticationEnsurer, (req, res, next) => {
         const a = map.get(c.candidateId) || 0; // デフォルト値は 0 を利用
         map.set(c.candidateId, a);
         availabilityMapMap.set(u.userId, map);
+
+        // 出欠数をカウント
+        if (!availabilitiesNumMap.has(c.candidateId)) {
+          availabilitiesNumMap.set(c.candidateId, [0, 0, 0]);
+        }
+        let availabilitiesNumAray = availabilitiesNumMap.get(c.candidateId);
+        availabilitiesNumAray[a] += 1;
+        availabilitiesNumMap.set(c.candidateId, availabilitiesNumAray);
+        console.log(availabilitiesNumMap.get(c.candidateId));
+
       });
     });
 
@@ -116,6 +127,7 @@ router.get('/:scheduleId', authenticationEnsurer, (req, res, next) => {
         candidates: storedCandidates,
         users: users,
         availabilityMapMap: availabilityMapMap,
+        availabilitiesNumMap: availabilitiesNumMap,
         commentMap: commentMap
       });
     });
