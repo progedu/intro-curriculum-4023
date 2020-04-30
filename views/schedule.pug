@@ -8,6 +8,10 @@ block content
       p(style="white-space:pre;") #{schedule.memo}
     div.card-footer
       p 作成者: #{schedule.user.username}
+    div.form-group
+      label(for="shareURL") 共有用 URL:
+      - var herokuURL = process.env.HEROKU_URL ? process.env.HEROKU_URL : 'http://localhost:8000/'
+      input(type="text" value=`${herokuURL}schedules/${schedule.scheduleId}/`)#shareURL.form-control
   - var isMine = parseInt(user.id) === schedule.user.userId
   if isMine
     div
@@ -16,11 +20,18 @@ block content
   table.table.table-bordered
     tr
       th 予定
+      th 出
+      th ？
+      th 欠
       each user in users
         th #{user.username}
     each candidate in candidates
       tr
+        - var availabilityNum = availabilitiesNumMap.get(candidate.candidateId)
         th #{candidate.candidateName}
+        td #{availabilityNum[2]}
+        td #{availabilityNum[1]}
+        td #{availabilityNum[0]}
         each user in users
           - var availability = availabilityMapMap.get(user.userId).get(candidate.candidateId)
           - var availabilityLabels = ['欠', '？', '出'];
@@ -36,6 +47,9 @@ block content
               h3 #{availabilityLabels[availability]}
     tr
       th コメント
+      td
+      td
+      td
       each user in users
         if user.isSelf
           td
