@@ -13,7 +13,7 @@ const deleteScheduleAggregate = require('../routes/schedules').deleteScheduleAgg
 describe('/login', () => {
   before(() => {
     passportStub.install(app);
-    passportStub.login({ username: 'testuser' });
+    passportStub.login({ id: 0, username: 'testuser' });
   });
 
   after(() => {
