@@ -28,6 +28,7 @@ $('.availability-toggle-button').each((i, e) => {
 
 const buttonSelfComment = $('#self-comment-button');
 buttonSelfComment.click(() => {
+  console.info('テスト');
   const scheduleId = buttonSelfComment.data('schedule-id');
   const userId = buttonSelfComment.data('user-id');
   const comment = prompt('コメントを255文字以内で入力してください。');
@@ -39,3 +40,16 @@ buttonSelfComment.click(() => {
       });
   }
 });
+
+// 削除ボタン押下時に警告を表示
+// 403エラーが返却されるため想定通り動作しないので注意
+const buttonDelete = $('#self-delete-button');
+buttonDelete.click(() => {
+  const confirm = window.confirm("本当に削除してもよろしいですか");
+  const scheduleId = buttonDelete.data('schedule-id');
+  scheduleId.scheduleId
+  if (confirm) {
+    $.post(`/schedules/${scheduleId}?delete=1`);
+  }
+})
+self-delete-button
