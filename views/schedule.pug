@@ -13,27 +13,31 @@ block content
     div
       a(href=`/schedules/${schedule.scheduleId}/edit`).btn.btn-info この予定を編集する
   h3.my-3 出欠表
+  - var availabilityLabels = ['欠', '？', '出'];
+  - var availabilityStyles = ['danger', 'secondary', 'success'];
   table.table.table-bordered
     tr
       th 予定
       each user in users
         th #{user.username}
+      each availabilityLabel, index in availabilityLabels.slice().reverse()
+        th(class=`text-${availabilityStyles.slice().reverse()[index]}`) #{availabilityLabel}
     each candidate in candidates
       tr
         th #{candidate.candidateName}
         each user in users
           - var availability = availabilityMapMap.get(user.userId).get(candidate.candidateId)
-          - var availabilityLabels = ['欠', '？', '出'];
-          - var buttonStyles = ['btn-danger', 'btn-secondary', 'btn-success'];
           td
             if user.isSelf
-              button(class=`availability-toggle-button btn-lg ${buttonStyles[availability]}`
+              button(class=`availability-toggle-button btn-lg btn-${availabilityStyles[availability]}`
                 data-schedule-id=schedule.scheduleId
                 data-user-id=user.userId
                 data-candidate-id=candidate.candidateId
                 data-availability=availability) #{availabilityLabels[availability]}
             else
-              h3 #{availabilityLabels[availability]}
+              button(class=`btn-lg btn-outline-${availabilityStyles[availability]} disabled`) #{availabilityLabels[availability]}
+        each availabilityLabel, index in availabilityLabels.slice().reverse()
+          td(class=`availability text-${availabilityStyles.slice().reverse()[index]}`) #{users.filter(u => availabilityMapMap.get(u.userId).get(candidate.candidateId) === availabilityLabels.length - index - 1).length}
     tr
       th コメント
       each user in users
@@ -48,3 +52,6 @@ block content
           td
             p
               small #{commentMap.get(user.userId)}
+
+      each availabilityLabel in availabilityLabels
+        td
