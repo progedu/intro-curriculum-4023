@@ -10,11 +10,17 @@ block content
     div.form-group
       label(for="memo") メモ
       textarea(name="memo")#memo.form-control #{schedule.memo}
-    div.form-group
+    div
       label 既存の日程候補
       ul.list-group
         each candidate in candidates
-          li.list-group-item #{candidate.candidateName}
+          li.list-group-item
+            label #{candidate.candidateName}
+            label(class="delete-candidate btn btn-danger mx-3"
+              data-schedule-id=schedule.scheduleId
+              data-candidate-id=candidate.candidateId
+            ) 削除
+    div.form-group
       label(for="candidates").my-2 候補日程の追加 (改行して複数入力してください)
       textarea(name="candidates")#candidates.form-control
     div
