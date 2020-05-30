@@ -39,3 +39,19 @@ buttonSelfComment.click(() => {
       });
   }
 });
+
+$('.delete-candidate').each((i, e) => {
+  const button = $(e);
+  button.click(() => {
+    const scheduleId = button.data('schedule-id');
+    const candidateId = button.data('candidate-id');
+    console.log(candidateId);
+    if ( candidateId ) {
+      $.post(`/schedules/${scheduleId}/candidates/${candidateId}/delete`,
+        { candidateId: candidateId },
+        (data) => {
+          button.parent().remove();
+        });
+    }
+  });
+});
