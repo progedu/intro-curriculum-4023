@@ -12,6 +12,7 @@ block content
     label(for="shareURL") 共有用 URL:
     - var herokuURL = process.env.HEROKU_URL ? process.env.HEROKU_URL : "http://localhost:8000";
     input(type="text" value=`${herokuURL}/schedules/${schedule.scheduleId}`)#shareUrl.form-control
+    button(type="button" data-clipboard-target="#shareUrl")#copyUrlbtn.btn.btn-info Copy to clipboard
   - var isMine = parseInt(user.id) === schedule.user.userId
   if isMine
     div
