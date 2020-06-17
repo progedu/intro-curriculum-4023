@@ -8,6 +8,11 @@ block content
       p(style="white-space:pre;") #{schedule.memo}
     div.card-footer
       p 作成者: #{schedule.user.username}
+  div.form-group
+    label(for="shareURL") 共有用 URL:
+    - var herokuURL = process.env.HEROKU_URL ? process.env.HEROKU_URL : 'http://localhost:8000/'
+    input(type="text" value=`${herokuURL}schedules/${schedule.scheduleId}/`)#shareURL.form-control
+
   - var isMine = parseInt(user.id) === schedule.user.userId
   if isMine
     div
@@ -48,3 +53,16 @@ block content
           td
             p
               small #{commentMap.get(user.userId)}
+  div
+  - var hasSchedule = schedules.length > 0
+  if hasSchedule
+    h3.my-3 あなたの作った予定一覧
+    table.table
+      tr
+        th 予定名
+        th 更新日時
+      each schedule in schedules
+        tr
+          td
+            a(href=`/schedules/${schedule.scheduleId}`) #{schedule.scheduleName}
+          td #{schedule.formattedUpdatedAt}

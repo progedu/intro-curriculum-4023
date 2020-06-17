@@ -9,6 +9,7 @@ const User = require('../models/user');
 const Availability = require('../models/availability');
 const Comment = require('../models/comment');
 const csrf = require('csurf');
+const moment = require('moment-timezone');
 const csrfProtection = csrf({ cookie: true });
 
 router.get('/new', authenticationEnsurer, csrfProtection, (req, res, next) => {
@@ -110,15 +111,30 @@ router.get('/:scheduleId', authenticationEnsurer, (req, res, next) => {
       comments.forEach((comment) => {
         commentMap.set(comment.userId, comment.comment);
       });
-      res.render('schedule', {
-        user: req.user,
-        schedule: storedSchedule,
-        candidates: storedCandidates,
-        users: users,
-        availabilityMapMap: availabilityMapMap,
-        commentMap: commentMap
+      //
+      if (req.user) {
+        Schedule.findAll({
+          where: {
+            createdBy: req.user.id
+          },
+          order: [['updatedAt', 'DESC']]
+        }).then((schedules) => {
+          schedules.forEach((schedule) => {
+            schedule.formattedUpdatedAt = moment(schedule.updatedAt).tz('Asia/Tokyo').format('YYYY/MM/DD HH:mm');
+          });
+          //
+          res.render('schedule', {
+            user: req.user,
+            schedules,
+            schedule: storedSchedule,
+            candidates: storedCandidates,
+            users: users,
+            availabilityMapMap: availabilityMapMap,
+            commentMap: commentMap
+          });
+        });
+      }
       });
-    });
   });
 });
 
