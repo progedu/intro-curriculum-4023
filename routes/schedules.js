@@ -10,6 +10,8 @@ const Availability = require('../models/availability');
 const Comment = require('../models/comment');
 const csrf = require('csurf');
 const csrfProtection = csrf({ cookie: true });
+const request = require('request-promise-native');
+const SLACK_URL = process.env.SLACK_URL;
 
 router.get('/new', authenticationEnsurer, csrfProtection, (req, res, next) => {
   res.render('new', { user: req.user, csrfToken: req.csrfToken() });
@@ -18,6 +20,7 @@ router.get('/new', authenticationEnsurer, csrfProtection, (req, res, next) => {
 router.post('/', authenticationEnsurer, csrfProtection, (req, res, next) => {
   const scheduleId = uuid.v4();
   const updatedAt = new Date();
+  let q = '';
   Schedule.create({
     scheduleId: scheduleId,
     scheduleName: req.body.scheduleName.slice(0, 255) || '（名称未設定）',
@@ -25,7 +28,28 @@ router.post('/', authenticationEnsurer, csrfProtection, (req, res, next) => {
     createdBy: req.user.id,
     updatedAt: updatedAt
   }).then((schedule) => {
-    createCandidatesAndRedirect(parseCandidateNames(req), scheduleId, res);
+    const href = req.protocol + '://' + req.headers.host + '/schedules/' + schedule.scheduleId;
+    const header = {
+      'Content-type': 'application/json'
+    }
+    const data = {
+      text:`予定を追加しました。\n予定:<${href}|${schedule.scheduleName}>\n候補:\n${replaceCandidateNames(req)}`
+    }
+    const options = {
+      url: SLACK_URL,
+      method: 'POST',
+      headers: header,
+      json: data
+    }
+    request(options).then(() => {
+      q = '?slc=1';
+    })
+    .catch((err)=>{
+      console.error(err.message);
+    })
+    .finally(()=>{
+      createCandidatesAndRedirect(parseCandidateNames(req), scheduleId, res, q);
+    });
   });
 });
 
@@ -223,7 +247,7 @@ function deleteScheduleAggregate(scheduleId, done, err) {
 
 router.deleteScheduleAggregate = deleteScheduleAggregate;
 
-function createCandidatesAndRedirect(candidateNames, scheduleId, res) {
+function createCandidatesAndRedirect(candidateNames, scheduleId, res, q='') {
   const candidates = candidateNames.map((c) => {
     return {
       candidateName: c,
@@ -231,12 +255,16 @@ function createCandidatesAndRedirect(candidateNames, scheduleId, res) {
     };
   });
   Candidate.bulkCreate(candidates).then(() => {
-    res.redirect('/schedules/' + scheduleId);
+    res.redirect('/schedules/' + scheduleId + q);
   });
 }
 
 function parseCandidateNames(req) {
   return req.body.candidates.trim().split('\n').map((s) => s.trim()).filter((s) => s !== "");
+}
+
+function replaceCandidateNames(req) {
+  return req.body.candidates.trim().split('\n').join('')
 }
 
 module.exports = router;

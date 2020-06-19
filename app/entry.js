@@ -39,3 +39,8 @@ buttonSelfComment.click(() => {
       });
   }
 });
+
+const msg = $(location).attr('search').split("?");
+if (msg[1] === "slc=1"){
+  alert("slackへ通知しました。");
+}
