@@ -23,6 +23,10 @@ const Schedule = loader.database.define('schedules', {
   updatedAt: {
     type: Sequelize.DATE,
     allowNull: false
+  },
+  createdAt: {
+    type: Sequelize.DATE,
+    allowNull: false
   }
 }, {
     freezeTableName: true,
