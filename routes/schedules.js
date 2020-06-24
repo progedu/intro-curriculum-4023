@@ -18,12 +18,14 @@ router.get('/new', authenticationEnsurer, csrfProtection, (req, res, next) => {
 router.post('/', authenticationEnsurer, csrfProtection, (req, res, next) => {
   const scheduleId = uuid.v4();
   const updatedAt = new Date();
+  const createdAt = new Date();
   Schedule.create({
     scheduleId: scheduleId,
     scheduleName: req.body.scheduleName.slice(0, 255) || '（名称未設定）',
     memo: req.body.memo,
     createdBy: req.user.id,
-    updatedAt: updatedAt
+    updatedAt: updatedAt,
+    createdAt: createdAt
   }).then((schedule) => {
     createCandidatesAndRedirect(parseCandidateNames(req), scheduleId, res);
   });

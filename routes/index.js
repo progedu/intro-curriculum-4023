@@ -16,6 +16,7 @@ router.get('/', (req, res, next) => {
     }).then((schedules) => {
       schedules.forEach((schedule) => {
         schedule.formattedUpdatedAt = moment(schedule.updatedAt).tz('Asia/Tokyo').format('YYYY/MM/DD HH:mm');
+        schedule.formattedCreatedAt = moment(schedule.createdAt).tz('Asia/Tokyo').format('YYYY/MM/DD HH:mm'); // 予定が作られた日
       });
       res.render('index', {
         title: title,
