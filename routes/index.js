@@ -17,6 +17,12 @@ router.get('/', (req, res, next) => {
     }).then((schedules) => {
       schedules.forEach((schedule) => {
         schedule.formattedUpdatedAt = moment(schedule.updatedAt).tz('Asia/Tokyo').format('YYYY/MM/DD HH:mm');
+      });
+      console.log(schedules);
+//      console.log('outer:'+schedules[0].formattedFilledAt);
+      return schedules;
+    }).then((schedules) => {
+      schedules.map((schedule) => {
         Availability.findAll({
           where: {
             scheduleId: schedule.scheduleId
@@ -26,12 +32,11 @@ router.get('/', (req, res, next) => {
           ]
         }).then((availabilities) => {
           if (availabilities) {
-            console.log('inner'+availabilities[0].filledAt);
+            console.log('inner' + availabilities[0].filledAt);
             schedule.formattedFilledAt = moment(availabilities[0].filledAt).tz('Asia/Tokyo').format('YYYY/MM/DD HH:mm');
           }
         });
       });
-      console.log('outer'+schedules[0].formattedFilledAt);
       return schedules;
     }).then((schedules) => {
       res.render('index', {
