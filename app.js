@@ -24,10 +24,13 @@ User.sync().then(() => {
   });
 });
 
+var GoogleStrategy = require('passport-google-oauth20').Strategy;
+var GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID || '965954643790-0loirrlt8gb33g7stbj7glgelgt1sfo5.apps.googleusercontent.com';
+var GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET || 'iDDdJvJQAtqu40RaCUbPBWW4';
 
 var GitHubStrategy = require('passport-github2').Strategy;
-var GITHUB_CLIENT_ID = process.env.GITHUB_CLIENT_ID;// || '2f831cb3d4aac02393aa';
-var GITHUB_CLIENT_SECRET = process.env.GITHUB_CLIENT_SECRET;// || '9fbc340ac0175123695d2dedfbdf5a78df3b8067';
+var GITHUB_CLIENT_ID = process.env.GITHUB_CLIENT_ID || '2f831cb3d4aac02393aa';
+var GITHUB_CLIENT_SECRET = process.env.GITHUB_CLIENT_SECRET || '9fbc340ac0175123695d2dedfbdf5a78df3b8067';
 
 passport.serializeUser(function (user, done) {
   done(null, user);
@@ -37,6 +40,24 @@ passport.deserializeUser(function (obj, done) {
   done(null, obj);
 });
 
+passport.use(new GoogleStrategy({
+  clientID: GOOGLE_CLIENT_ID,
+  clientSecret: GOOGLE_CLIENT_SECRET,
+  callbackURL: process.env.HEROKU_URL ? process.env.HEROKU_URL + 'auth/google/callback' : 'http://localhost:8000/auth/google/callback'
+},
+  function (accessToken, refreshToken, profile, done) {
+    process.nextTick(function () {
+      console.log(profile);
+      done(null, profile);
+      // User.upsert({
+      //   userId: profile.id,
+      //   username: profile.username
+      // }).then(() => {
+      //   done(null, profile);
+      // });
+    });
+  }
+));
 
 passport.use(new GitHubStrategy({
   clientID: GITHUB_CLIENT_ID,
@@ -86,11 +107,29 @@ app.use('/schedules', schedulesRouter);
 app.use('/schedules', availabilitiesRouter);
 app.use('/schedules', commentsRouter);
 
+app.get('/auth/google',
+  passport.authenticate('google', { scope: ['profile'] }),
+  function (req, res) {
+  });
+app.get('/auth/google/callback',
+  passport.authenticate('google', { failureRedirect: '/login' }),
+  function (req, res) {
+    var loginFrom = req.cookies.loginFrom;
+    // オープンリダイレクタ脆弱性対策
+    if (loginFrom &&
+      !loginFrom.includes('http://') &&
+      !loginFrom.includes('https://')) {
+      res.clearCookie('loginFrom');
+      res.redirect(loginFrom);
+    } else {
+      res.redirect('/');
+    }
+  });
+
 app.get('/auth/github',
   passport.authenticate('github', { scope: ['user:email'] }),
   function (req, res) {
   });
-
 app.get('/auth/github/callback',
   passport.authenticate('github', { failureRedirect: '/login' }),
   function (req, res) {
