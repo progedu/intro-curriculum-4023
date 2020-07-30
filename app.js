@@ -25,12 +25,12 @@ User.sync().then(() => {
 });
 
 var GoogleStrategy = require('passport-google-oauth20').Strategy;
-var GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID || '965954643790-0loirrlt8gb33g7stbj7glgelgt1sfo5.apps.googleusercontent.com';
-var GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET || 'iDDdJvJQAtqu40RaCUbPBWW4';
+var GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
+var GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET;
 
 var GitHubStrategy = require('passport-github2').Strategy;
-var GITHUB_CLIENT_ID = process.env.GITHUB_CLIENT_ID || '2f831cb3d4aac02393aa';
-var GITHUB_CLIENT_SECRET = process.env.GITHUB_CLIENT_SECRET || '9fbc340ac0175123695d2dedfbdf5a78df3b8067';
+var GITHUB_CLIENT_ID = process.env.GITHUB_CLIENT_ID;
+var GITHUB_CLIENT_SECRET = process.env.GITHUB_CLIENT_SECRET;
 
 passport.serializeUser(function (user, done) {
   done(null, user);
