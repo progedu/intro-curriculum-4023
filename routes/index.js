@@ -8,6 +8,7 @@ const Availability = require('../models/availability');
 /* GET home page. */
 router.get('/', (req, res, next) => {
   const title = '予定調整くん';
+  let scheduleg = null;
   if (req.user) {
     Schedule.findAll({
       where: {
@@ -22,10 +23,10 @@ router.get('/', (req, res, next) => {
 //      console.log('outer:'+schedules[0].formattedFilledAt);
       return schedules;
     }).then((schedules) => {
-      schedules.map((schedule) => {
-        Availability.findAll({
+      scheduleg = schedules;
+        return Availability.findAll({
           where: {
-            scheduleId: schedule.scheduleId
+            scheduleId: schedules[0].scheduleId
           },
           order: [
             ['"filledAt"', 'DESC']
@@ -33,16 +34,19 @@ router.get('/', (req, res, next) => {
         }).then((availabilities) => {
           if (availabilities) {
             console.log('inner' + availabilities[0].filledAt);
-            schedule.formattedFilledAt = moment(availabilities[0].filledAt).tz('Asia/Tokyo').format('YYYY/MM/DD HH:mm');
+            schedules[0].formattedFilledAt = moment(availabilities[0].filledAt).tz('Asia/Tokyo').format('YYYY/MM/DD HH:mm');
           }
-        });
+//      schedules.map((schedule) => {
+//        });
       });
-      return schedules;
-    }).then((schedules) => {
+//      return schedules;
+    }).then((avails) => {
+      console.log(avails);
       res.render('index', {
         title: title,
         user: req.user,
-        schedules: schedules
+        schedules: scheduleg,
+        avails: avails
       });
     });
   } else {
