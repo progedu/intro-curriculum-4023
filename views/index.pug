@@ -7,6 +7,7 @@ block content
   if user
     h3 #{user.id}
     h3 #{user.username}
+    h3 #{user.displayName}
     div
       a(href="/schedules/new").btn.btn-info 予定を作る
     - var hasSchedule = schedules.length > 0
