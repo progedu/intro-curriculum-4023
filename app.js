@@ -47,14 +47,12 @@ passport.use(new GoogleStrategy({
 },
   function (accessToken, refreshToken, profile, done) {
     process.nextTick(function () {
-      console.log(profile);
-      done(null, profile);
-      // User.upsert({
-      //   userId: profile.id,
-      //   username: profile.username
-      // }).then(() => {
-      //   done(null, profile);
-      // });
+      User.upsert({
+        userId: profile.id,
+        username: profile.displayName
+      }).then(() => {
+        done(null, profile);
+      });
     });
   }
 ));
