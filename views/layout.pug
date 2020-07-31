@@ -15,7 +15,7 @@ html
         a(href="/").navbar-brand.nav-link 予定調整さん
       ul.navbar-nav
         if user
-          - var displayUserName = user.username || user..displayName;
+          - var displayUserName = user.username;
           li.nav-item
             a(href="/logout").nav-link #{displayUserName} をログアウト
         else
