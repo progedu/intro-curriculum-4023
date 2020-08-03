@@ -8,7 +8,7 @@ const Availability = require('../models/availability');
 /* GET home page. */
 router.get('/', (req, res, next) => {
   const title = '予定調整くん';
-  let scheduleg = null;
+  //let scheduleg = null;
   if (req.user) {
     Schedule.findAll({
       where: {
@@ -19,34 +19,41 @@ router.get('/', (req, res, next) => {
       schedules.forEach((schedule) => {
         schedule.formattedUpdatedAt = moment(schedule.updatedAt).tz('Asia/Tokyo').format('YYYY/MM/DD HH:mm');
       });
-      console.log(schedules);
-//      console.log('outer:'+schedules[0].formattedFilledAt);
+      //console.log(schedules);
+      //console.log('outer:'+schedules[0].formattedFilledAt);
       return schedules;
-    }).then((schedules) => {
-      scheduleg = schedules;
+    }).then(async (schedules) => {
+      //scheduleg = schedules;
+      
+      const availabilityLatest = schedules.map((schedule) => {
         return Availability.findAll({
           where: {
-            scheduleId: schedules[0].scheduleId
+            scheduleId: schedule.scheduleId
           },
           order: [
             ['"filledAt"', 'DESC']
           ]
         }).then((availabilities) => {
-          if (availabilities) {
-            console.log('inner' + availabilities[0].filledAt);
-            schedules[0].formattedFilledAt = moment(availabilities[0].filledAt).tz('Asia/Tokyo').format('YYYY/MM/DD HH:mm');
-          }
-//      schedules.map((schedule) => {
-//        });
+          //console.log('just before:');
+          //console.log(availabilities);
+          if (availabilities.length) {
+            //console.log('inner1:')
+            //console.log(availabilities[0].filledAt);
+            //console.log('inner' + availabilities[0].filledAt);
+            schedule.formattedFilledAt = moment(availabilities[0].filledAt).tz('Asia/Tokyo').format('YYYY/MM/DD HH:mm');
+          } //else {
+            //console.log('skipped');
+          //}
+        });
       });
-//      return schedules;
-    }).then((avails) => {
-      console.log(avails);
+
+      await Promise.all(availabilityLatest);
+      return schedules;
+    }).then((schedules) => {
       res.render('index', {
         title: title,
         user: req.user,
-        schedules: scheduleg,
-        avails: avails
+        schedules: schedules
       });
     });
   } else {
