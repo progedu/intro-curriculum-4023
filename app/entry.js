@@ -12,8 +12,11 @@ $('.availability-toggle-button').each((i, e) => {
     const candidateId = button.data('candidate-id');
     const availability = parseInt(button.data('availability'));
     const nextAvailability = (availability + 1) % 3;
+    const filledAt = Date.now();
     $.post(`/schedules/${scheduleId}/users/${userId}/candidates/${candidateId}`,
-      { availability: nextAvailability },
+      {
+        availability: nextAvailability
+      },
       (data) => {
         button.data('availability', data.availability);
         const availabilityLabels = ['欠', '？', '出'];

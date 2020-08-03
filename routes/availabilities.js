@@ -8,6 +8,8 @@ router.post('/:scheduleId/users/:userId/candidates/:candidateId', authentication
   const scheduleId = req.params.scheduleId;
   const userId = req.params.userId;
   const candidateId = req.params.candidateId;
+  const filledAt = new Date();
+  console.log(filledAt);
   let availability = req.body.availability;
   availability = availability ? parseInt(availability) : 0;
 
@@ -15,7 +17,8 @@ router.post('/:scheduleId/users/:userId/candidates/:candidateId', authentication
     scheduleId: scheduleId,
     userId: userId,
     candidateId: candidateId,
-    availability: availability
+    availability: availability,
+    filledAt: filledAt
   }).then(() => {
     res.json({ status: 'OK', availability: availability });
   });

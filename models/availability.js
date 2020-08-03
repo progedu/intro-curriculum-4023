@@ -21,6 +21,10 @@ const Availability = loader.database.define('availabilities', {
   scheduleId: {
     type: Sequelize.UUID,
     allowNull: false
+  },
+  filledAt: {
+    type: Sequelize.DATE,
+    allowNull: false
   }
 }, {
     freezeTableName: true,
