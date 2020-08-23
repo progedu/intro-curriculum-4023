@@ -2,12 +2,17 @@ extends layout
 
 block content
   div.card.my-3
+    - var herokuURL = process.env.HEROKU_URL ? process.env.HEROKU_URL : 'http://localhost:8000/'
     div.card-header
       h4 #{schedule.scheduleName}
     div.card-body
       p(style="white-space:pre;") #{schedule.memo}
     div.card-footer
       p 作成者: #{schedule.user.username}
+    small
+      ul.list-group.list-group-flush
+        li.list-group-item 共有リンク：
+        li.list-group-item #{`${herokuURL}schedules/${schedule.scheduleId}/`}
   - var isMine = parseInt(user.id) === schedule.user.userId
   if isMine
     div
