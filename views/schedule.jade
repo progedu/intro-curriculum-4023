@@ -36,16 +36,24 @@ block content
             else
               h3 #{availabilityLabels[availability]}
     tr
+      th
+      each user in users      
+        if user.isSelf
+          td
+            div
+              form(action="/schedules/#{schedule.scheduleId}/users/#{user.userId}/makingAvailableAll", method="post")
+                button(class="btn-s btn-secondary" type="submit") 全て出席にする
+    tr
       th コメント
       each user in users
         if user.isSelf
           td
             p
               small(id="self-comment") #{commentMap.get(user.userId)}
-            button(class="btn-xs btn-info"
-              id="self-comment-button"
-              data-schedule-id="#{schedule.scheduleId}"
-              data-user-id="#{user.userId}") 編集
+                button(class="btn-s btn-info"
+                  id="self-comment-button"
+                  data-schedule-id="#{schedule.scheduleId}"
+                  data-user-id="#{user.userId}") 編集
         else
           td
             p

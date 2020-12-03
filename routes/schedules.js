@@ -8,6 +8,7 @@ const Candidate = require('../models/candidate');
 const User = require('../models/user');
 const Availability = require('../models/availability');
 const Comment = require('../models/comment');
+const clipboardy = require('clipboardy');
 const csrf = require('csurf');
 const csrfProtection = csrf({ cookie: true });
 
@@ -195,6 +196,25 @@ router.post('/:scheduleId', authenticationEnsurer, csrfProtection, (req, res, ne
     const err = new Error('不正なリクエストです');
     err.status = 400;
     next(err);
+  }
+});
+router.post('/:scheduleId/users/:userId/makingAvailableAll', authenticationEnsurer, (req, res, next) => {
+  const scheduleId = req.params.scheduleId;
+  const userId = req.params.userId;
+  const availability = 2;
+
+  if (req.user.id === userId){
+    Availability.update(    
+      {availability: availability},
+      {where:{
+        scheduleId: scheduleId,
+        userId: userId
+        }
+      }).then(() => {
+        res.redirect('/schedules/' + scheduleId);
+      });
+  } else{
+    res.redirect('/schedules/' + scheduleId);
   }
 });
 
