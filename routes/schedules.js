@@ -8,7 +8,6 @@ const Candidate = require('../models/candidate');
 const User = require('../models/user');
 const Availability = require('../models/availability');
 const Comment = require('../models/comment');
-const clipboardy = require('clipboardy');
 const csrf = require('csurf');
 const csrfProtection = csrf({ cookie: true });
 
@@ -198,10 +197,11 @@ router.post('/:scheduleId', authenticationEnsurer, csrfProtection, (req, res, ne
     next(err);
   }
 });
+//全て出席にするボタン
 router.post('/:scheduleId/users/:userId/makingAvailableAll', authenticationEnsurer, (req, res, next) => {
   const scheduleId = req.params.scheduleId;
   const userId = req.params.userId;
-  const availability = 2;
+  const availability = 2;//出席
 
   if (req.user.id === userId){
     Availability.update(    

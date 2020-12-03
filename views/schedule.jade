@@ -9,6 +9,8 @@ block content
     div(class="panel-footer")
       p 作成者: #{schedule.user.username}
   - var isMine = parseInt(user.id) === schedule.user.userId
+  - var copyTgt = process.env.HEROKU_URL ? process.env.HEROKU_URL + "/schedules/" + schedule.scheduleId : 'http://localhost:8000/schedules/' + schedule.scheduleId
+  button(id="copyButton" value=copyTgt) 予定URLをコピー
   if isMine
     div
       a(class="btn btn-info" href="/schedules/#{schedule.scheduleId}/edit") この予定を編集する
@@ -58,3 +60,4 @@ block content
           td
             p
               small #{commentMap.get(user.userId)}
+  script(src="/javascripts/client.js")
