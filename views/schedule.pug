@@ -18,7 +18,10 @@ block content
       th 予定
       each user in users
         th #{user.username}
+      th 出席数
+    - var index = 0;
     each candidate in candidates
+      - index++;
       tr
         th #{candidate.candidateName}
         each user in users
@@ -34,6 +37,8 @@ block content
                 data-availability=availability) #{availabilityLabels[availability]}
             else
               h3 #{availabilityLabels[availability]}
+        td(class=`count-${index}`
+          data-count=candidate.count) #{candidate.count}
     tr
       th コメント
       each user in users
@@ -48,3 +53,4 @@ block content
           td
             p
               small #{commentMap.get(user.userId)}
+      td
