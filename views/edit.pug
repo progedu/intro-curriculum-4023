@@ -22,4 +22,8 @@ block content
   h3.my-3 危険な変更
   form(method="post", action=`/schedules/${schedule.scheduleId}?delete=1`)
     input(type="hidden" name="_csrf" value!=csrfToken)
+    div.form-check
+      input(type='checkbox' value='checked' required='required' )#deleatCheck
+      label(for='deleatCheck').my-2 本当に削除する場合はこちらをクリックしてください。
+
     button(type="submit").btn.btn-danger この予定を削除する
