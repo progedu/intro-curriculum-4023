@@ -48,3 +48,6 @@ block content
           td
             p
               small #{commentMap.get(user.userId)}
+  div
+    - var twitterText = "予定調整くんで「" + schedule.scheduleName + "」を調整中！";
+    a(href=`//twitter.com/intent/tweet?text=${twitterText}` target="_blank").btn.btn-info.my-3 ツイート
