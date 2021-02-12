@@ -40,4 +40,4 @@ saveCommentChangeButton.on('click', () => {
       });
     $('#comment-modal').modal('hide')
   }
-})
+});
