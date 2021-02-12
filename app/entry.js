@@ -27,15 +27,18 @@ $('.availability-toggle-button').each((i, e) => {
 });
 
 const buttonSelfComment = $('#self-comment-button');
-buttonSelfComment.click(() => {
+const saveCommentChangeButton = $('#save-comment-change-button');
+saveCommentChangeButton.on('click', () => {
   const scheduleId = buttonSelfComment.data('schedule-id');
   const userId = buttonSelfComment.data('user-id');
-  const comment = prompt('コメントを255文字以内で入力してください。');
+  const comment = $('#comment').val();
+  console.log(comment, scheduleId, userId);
   if (comment) {
     $.post(`/schedules/${scheduleId}/users/${userId}/comments`,
       { comment: comment },
       (data) => {
         $('#self-comment').text(data.comment);
       });
+    $('#comment-modal').modal('hide')
   }
-});
+})

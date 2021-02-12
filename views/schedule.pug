@@ -43,7 +43,30 @@ block content
               small#self-comment #{commentMap.get(user.userId)}
             button(
               data-schedule-id=schedule.scheduleId
-              data-user-id=user.userId)#self-comment-button.btn-sm.btn-info 編集
+              data-user-id=user.userId
+              data-toggle="modal"
+              data-target="#comment-modal")#self-comment-button.btn-sm.btn-info 編集
+            //- モーダルウィンドウ
+            div.modal.fade#comment-modal(
+              tabindex="-1"
+              role=dialog
+              aria-labelledby="comment-modal-label"
+              aria-hidden="true")
+              div.modal-dialog(role="document")
+                div.modal-content
+                  div.modal-header
+                    h5.modal-title#comment-modal-label コメントを255文字以内で入力してください。
+                    button.close(
+                      data-dismiss="modal"
+                      aria-label="Close")
+                      span(aria-hidden="true") &times;
+                  div.modal-body
+                    div.form-group
+                      label(for="comment") メモ
+                      input(type="text" name="comment" value=commentMap.get(user.userId))#comment.form-control
+                  div.modal-footer
+                    button.btn.btn-secondary(data-dismiss="modal") 閉じる
+                    button#save-comment-change-button.btn.btn-primary 変更を保存する
         else
           td
             p
