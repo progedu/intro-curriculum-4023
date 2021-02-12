@@ -32,7 +32,6 @@ saveCommentChangeButton.on('click', () => {
   const scheduleId = buttonSelfComment.data('schedule-id');
   const userId = buttonSelfComment.data('user-id');
   const comment = $('#comment').val();
-  console.log(comment, scheduleId, userId);
   if (comment) {
     $.post(`/schedules/${scheduleId}/users/${userId}/comments`,
       { comment: comment },
