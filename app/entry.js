@@ -31,11 +31,15 @@ buttonSelfComment.click(() => {
   const scheduleId = buttonSelfComment.data('schedule-id');
   const userId = buttonSelfComment.data('user-id');
   const comment = prompt('コメントを255文字以内で入力してください。');
+  const csrfToken = $('input[name="_csrf"]');
   if (comment) {
     $.post(`/schedules/${scheduleId}/users/${userId}/comments`,
-      { comment: comment },
-      (data) => {
+      { comment: comment, _csrf: csrfToken.val() },
+      ).done((data) => {
         $('#self-comment').text(data.comment);
+        csrfToken.val(data.csrfToken);
+      }).fail((err) => {
+        alert('コメントの更新に失敗しました。\nページを更新してからもう一度お試し下さい。')
       });
   }
 });

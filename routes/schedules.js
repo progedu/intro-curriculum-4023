@@ -29,7 +29,7 @@ router.post('/', authenticationEnsurer, csrfProtection, (req, res, next) => {
   });
 });
 
-router.get('/:scheduleId', authenticationEnsurer, (req, res, next) => {
+router.get('/:scheduleId', authenticationEnsurer, csrfProtection, (req, res, next) => {
   let storedSchedule = null;
   let storedCandidates = null;
   Schedule.findOne({
@@ -116,7 +116,8 @@ router.get('/:scheduleId', authenticationEnsurer, (req, res, next) => {
         candidates: storedCandidates,
         users: users,
         availabilityMapMap: availabilityMapMap,
-        commentMap: commentMap
+        commentMap: commentMap,
+        csrfToken: req.csrfToken()
       });
     });
   });
