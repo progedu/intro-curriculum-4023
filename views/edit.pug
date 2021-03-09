@@ -11,6 +11,10 @@ block content
       label(for="memo") メモ
       textarea(name="memo")#memo.form-control #{schedule.memo}
     div.form-group
+      label(for="limitDate") 有効期限
+      textarea(name="limitDate")#limitDate.form-control #{schedule.limitDate}
+
+    div.form-group
       label 既存の日程候補
       ul.list-group
         each candidate in candidates

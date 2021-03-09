@@ -8,6 +8,7 @@ block content
       p(style="white-space:pre;") #{schedule.memo}
     div.card-footer
       p 作成者: #{schedule.user.username}
+      p 有効期限: #{schedule.limitDate}
   - var isMine = parseInt(user.id) === schedule.user.userId
   if isMine
     div
@@ -43,8 +44,9 @@ block content
               small#self-comment #{commentMap.get(user.userId)}
             button(
               data-schedule-id=schedule.scheduleId
-              data-user-id=user.userId)#self-comment-button.btn-sm.btn-info 編集
+              data-user-id=user.userId)#self-comment-button.btn-xs.btn-info 編集
         else
           td
             p
               small #{commentMap.get(user.userId)}
+

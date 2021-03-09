@@ -24,6 +24,11 @@ const Schedule = loader.database.define('schedules', {
     type: Sequelize.DATE,
     allowNull: false
   }
+  ,
+  limitDate: {
+    type: Sequelize.STRING,
+    allowNull: true
+  }
 }, {
     freezeTableName: true,
     timestamps: false,

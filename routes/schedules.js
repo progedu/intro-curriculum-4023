@@ -11,11 +11,11 @@ const Comment = require('../models/comment');
 const csrf = require('csurf');
 const csrfProtection = csrf({ cookie: true });
 
-router.get('/new', authenticationEnsurer, csrfProtection, (req, res, next) => {
-  res.render('new', { user: req.user, csrfToken: req.csrfToken() });
+router.get('/new', authenticationEnsurer, csrfProtection,(req, res, next) => {
+  res.render('new', { user: req.user, csrfToken: req.csrfToken()});
 });
 
-router.post('/', authenticationEnsurer, csrfProtection, (req, res, next) => {
+router.post('/', authenticationEnsurer, csrfProtection,(req, res, next) => {
   const scheduleId = uuid.v4();
   const updatedAt = new Date();
   Schedule.create({
@@ -23,7 +23,8 @@ router.post('/', authenticationEnsurer, csrfProtection, (req, res, next) => {
     scheduleName: req.body.scheduleName.slice(0, 255) || '（名称未設定）',
     memo: req.body.memo,
     createdBy: req.user.id,
-    updatedAt: updatedAt
+    updatedAt: updatedAt,
+    limitDate: req.body.limitDate.slice(0, 255)||'未設定'
   }).then((schedule) => {
     createCandidatesAndRedirect(parseCandidateNames(req), scheduleId, res);
   });
@@ -122,7 +123,7 @@ router.get('/:scheduleId', authenticationEnsurer, (req, res, next) => {
   });
 });
 
-router.get('/:scheduleId/edit', authenticationEnsurer, csrfProtection, (req, res, next) => {
+router.get('/:scheduleId/edit', authenticationEnsurer, csrfProtection,(req, res, next) => {
   Schedule.findOne({
     where: {
       scheduleId: req.params.scheduleId
@@ -137,7 +138,8 @@ router.get('/:scheduleId/edit', authenticationEnsurer, csrfProtection, (req, res
           user: req.user,
           schedule: schedule,
           candidates: candidates,
-          csrfToken: req.csrfToken()
+          limitDate: req.body.limitDate||'未設定',
+          csrfToken:req.csrfToken()
         });
       });
     } else {
@@ -152,7 +154,7 @@ function isMine(req, schedule) {
   return schedule && parseInt(schedule.createdBy) === parseInt(req.user.id);
 }
 
-router.post('/:scheduleId', authenticationEnsurer, csrfProtection, (req, res, next) => {
+router.post('/:scheduleId', authenticationEnsurer,csrfProtection, (req, res, next) => {
   Schedule.findOne({
     where: {
       scheduleId: req.params.scheduleId
@@ -165,6 +167,7 @@ router.post('/:scheduleId', authenticationEnsurer, csrfProtection, (req, res, ne
           scheduleId: schedule.scheduleId,
           scheduleName: req.body.scheduleName.slice(0, 255) || '（名称未設定）',
           memo: req.body.memo,
+          limitDate: req.body.limitDate.slice(0, 255)||'未設定',
           createdBy: req.user.id,
           updatedAt: updatedAt
         }).then((schedule) => {
