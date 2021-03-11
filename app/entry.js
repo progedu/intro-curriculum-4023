@@ -31,11 +31,40 @@ buttonSelfComment.click(() => {
   const scheduleId = buttonSelfComment.data('schedule-id');
   const userId = buttonSelfComment.data('user-id');
   const comment = prompt('コメントを255文字以内で入力してください。');
+  const csrfToken = $('input[name="_csrf"]');
   if (comment) {
     $.post(`/schedules/${scheduleId}/users/${userId}/comments`,
-      { comment: comment },
-      (data) => {
+      { comment: comment, _csrf: csrfToken.val() },
+      ).done((data) => {
+        deleteOldAlert();
         $('#self-comment').text(data.comment);
+        csrfToken.val(data.csrfToken);
+        alertMessage('コメントを更新しました');
+      }).fail((err) => {
+        alert('コメントの更新に失敗しました。\nページを更新してからもう一度お試し下さい。')
       });
   }
 });
+
+const copyURLButton = $('#copyURLButton');
+copyURLButton.click(() => {
+  deleteOldAlert();
+  const shareURL = $('#shareURL');
+  shareURL.select();
+  document.execCommand('copy');
+  getSelection().empty();
+	shareURL.blur();
+  alertMessage('コピーしました');
+});
+
+$(function () {
+  $('[data-toggle="tooltip"]').tooltip()
+})
+
+function alertMessage(message) {
+  var success = $(`<div class="text-center alert alert-success alert-dismissible fade show" role="alert">${message}</div>`).css({'position':'absolute', 'width': '100%','left':'0', 'z-index': '1'}).prependTo('nav').fadeOut(3000, () => success.remove());
+}
+
+function deleteOldAlert() {
+  $('.alert').remove();
+}

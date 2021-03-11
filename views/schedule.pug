@@ -8,6 +8,11 @@ block content
       p(style="white-space:pre;") #{schedule.memo}
     div.card-footer
       p 作成者: #{schedule.user.username}
+  div.form-group
+    label(for="shareURL").col-form-label 共有用URL：
+    button(data-toggle="tooltip" title="共有用URLをコピー")#copyURLButton.btn.btn-outline-primary.btn-sm copy
+    -var shareURL = process.env.HEROKU_URL ? process.env.HEROKU_URL: 'http://localhost:8000/'
+    input(type="text" value=`${shareURL}schedules/${schedule.scheduleId}/` readonly)#shareURL.form-control-plaintext
   - var isMine = parseInt(user.id) === schedule.user.userId
   if isMine
     div
@@ -48,3 +53,4 @@ block content
           td
             p
               small #{commentMap.get(user.userId)}
+  input(type="hidden", name="_csrf" value!=csrfToken)
