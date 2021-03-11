@@ -156,6 +156,7 @@ describe('/schedules/:scheduleId/users/:userId/comments', () => {
         .end((err, res) => {
           const match = res.text.match(/<input type="hidden" name="_csrf" value="(.*?)">/);
           const csrf = match[1];
+          const setCookie = res.headers['set-cookie'];
           request(app)
             .post('/schedules')
             .set('cookie', res.headers['set-cookie'])
@@ -166,8 +167,9 @@ describe('/schedules/:scheduleId/users/:userId/comments', () => {
               // 更新がされることをテスト
               request(app)
                 .post(`/schedules/${scheduleId}/users/${0}/comments`)
-                .send({ comment: 'testcomment' })
-                .expect('{"status":"OK","comment":"testcomment"}')
+                .set('cookie', setCookie)
+                .send({ comment: 'testcomment', _csrf: csrf })
+                .expect(/{"status":"OK","comment":"testcomment","csrfToken":(.+)}/)
                 .end((err, res) => {
                   Comment.findAll({
                     where: { scheduleId: scheduleId }
@@ -283,8 +285,8 @@ describe('/schedules/:scheduleId?delete=1', () => {
                 request(app)
                   .post(`/schedules/${scheduleId}/users/${0}/comments`)
                   .set('cookie', setCookie)
-                  .send({ comment: 'testcomment' })
-                  .expect('{"status":"OK","comment":"testcomment"}')
+                  .send({ comment: 'testcomment', _csrf: csrf })
+                  .expect(/{"status":"OK","comment":"testcomment","csrfToken":(.+)}/)
                   .end((err, res) => {
                     if (err) done(err);
                     resolve();
