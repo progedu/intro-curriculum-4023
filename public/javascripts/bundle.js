@@ -132,13 +132,43 @@ buttonSelfComment.click(function () {
       comment: comment,
       _csrf: csrfToken.val()
     }).done(function (data) {
+      deleteOldAlert();
       jquery__WEBPACK_IMPORTED_MODULE_0___default()('#self-comment').text(data.comment);
       csrfToken.val(data.csrfToken);
+      alertMessage('コメントを更新しました');
     }).fail(function (err) {
       alert('コメントの更新に失敗しました。\nページを更新してからもう一度お試し下さい。');
     });
   }
 });
+var copyURLButton = jquery__WEBPACK_IMPORTED_MODULE_0___default()('#copyURLButton');
+copyURLButton.click(function () {
+  deleteOldAlert();
+  var shareURL = jquery__WEBPACK_IMPORTED_MODULE_0___default()('#shareURL');
+  shareURL.select();
+  document.execCommand('copy');
+  getSelection().empty();
+  shareURL.blur();
+  alertMessage('コピーしました');
+});
+jquery__WEBPACK_IMPORTED_MODULE_0___default()(function () {
+  jquery__WEBPACK_IMPORTED_MODULE_0___default()('[data-toggle="tooltip"]').tooltip();
+});
+
+function alertMessage(message) {
+  var success = jquery__WEBPACK_IMPORTED_MODULE_0___default()("<div class=\"text-center alert alert-success alert-dismissible fade show\" role=\"alert\">".concat(message, "</div>")).css({
+    'position': 'absolute',
+    'width': '100%',
+    'left': '0',
+    'z-index': '1'
+  }).prependTo('nav').fadeOut(3000, function () {
+    return success.remove();
+  });
+}
+
+function deleteOldAlert() {
+  jquery__WEBPACK_IMPORTED_MODULE_0___default()('.alert').remove();
+}
 
 /***/ }),
 /* 1 */
