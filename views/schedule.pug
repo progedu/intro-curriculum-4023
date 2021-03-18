@@ -48,3 +48,12 @@ block content
           td
             p
               small #{commentMap.get(user.userId)}
+  div
+    each user in users 
+      if user.isSelf
+        button(
+          type="button",
+          data-schedule-id=schedule.scheduleId,
+          data-user-id=user.userId
+        )#availability-all-agree-button.btn.btn-success 全ての候補を出席にする
+        p#availability-agree-comment

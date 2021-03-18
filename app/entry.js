@@ -1,41 +1,68 @@
-'use strict';
-import $ from 'jquery';
-const global = Function('return this;')();
+"use strict";
+import $ from "jquery";
+const global = Function("return this;")();
 global.jQuery = $;
-import bootstrap from 'bootstrap';
+import bootstrap from "bootstrap";
 
-$('.availability-toggle-button').each((i, e) => {
+$(".availability-toggle-button").each((i, e) => {
   const button = $(e);
   button.click(() => {
-    const scheduleId = button.data('schedule-id');
-    const userId = button.data('user-id');
-    const candidateId = button.data('candidate-id');
-    const availability = parseInt(button.data('availability'));
+    const scheduleId = button.data("schedule-id");
+    const userId = button.data("user-id");
+    const candidateId = button.data("candidate-id");
+    const availability = parseInt(button.data("availability"));
     const nextAvailability = (availability + 1) % 3;
-    $.post(`/schedules/${scheduleId}/users/${userId}/candidates/${candidateId}`,
+    $.post(
+      `/schedules/${scheduleId}/users/${userId}/candidates/${candidateId}`,
       { availability: nextAvailability },
       (data) => {
-        button.data('availability', data.availability);
-        const availabilityLabels = ['欠', '？', '出'];
+        button.data("availability", data.availability);
+        const availabilityLabels = ["欠", "？", "出"];
         button.text(availabilityLabels[data.availability]);
 
-        const buttonStyles = ['btn-danger', 'btn-secondary', 'btn-success'];
-        button.removeClass('btn-danger btn-secondary btn-success');
+        const buttonStyles = ["btn-danger", "btn-secondary", "btn-success"];
+        button.removeClass("btn-danger btn-secondary btn-success");
         button.addClass(buttonStyles[data.availability]);
-      });
+      }
+    );
   });
 });
 
-const buttonSelfComment = $('#self-comment-button');
+const buttonSelfComment = $("#self-comment-button");
 buttonSelfComment.click(() => {
-  const scheduleId = buttonSelfComment.data('schedule-id');
-  const userId = buttonSelfComment.data('user-id');
-  const comment = prompt('コメントを255文字以内で入力してください。');
+  const scheduleId = buttonSelfComment.data("schedule-id");
+  const userId = buttonSelfComment.data("user-id");
+  const comment = prompt("コメントを255文字以内で入力してください。");
   if (comment) {
-    $.post(`/schedules/${scheduleId}/users/${userId}/comments`,
+    $.post(
+      `/schedules/${scheduleId}/users/${userId}/comments`,
       { comment: comment },
       (data) => {
-        $('#self-comment').text(data.comment);
-      });
+        $("#self-comment").text(data.comment);
+      }
+    );
   }
+});
+
+$("#availability-all-agree-button").on("click", (e) => {
+  const scheduleId = $(e.currentTarget).data("schedule-id");
+  const userId = $(e.currentTarget).data("user-id");
+
+  $.post(
+    `/schedules/${scheduleId}/users/${userId}/availabilities`,
+    {},
+    (data) => {
+      console.log(data.message);
+
+      $(".availability-toggle-button").each((i, e) => {
+        const $button = $(e);
+        $button.data("availability", "2");
+        $button.text("出");
+        $button.removeClass("btn-danger btn-secondary btn-success");
+        $button.addClass("btn-success");
+      });
+
+      $("#availability-agree-comment").text("全ての候補を出席に変更しました");
+    }
+  );
 });
