@@ -12,6 +12,10 @@ const Schedule = loader.database.define('schedules', {
     type: Sequelize.STRING,
     allowNull: false
   },
+  schedulePlace: {
+    type: Sequelize.STRING,
+    allowNull: true
+  },
   memo: {
     type: Sequelize.TEXT,
     allowNull: false
