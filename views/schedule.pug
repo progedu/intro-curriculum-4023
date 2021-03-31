@@ -8,6 +8,10 @@ block content
       p(style="white-space:pre;") #{schedule.memo}
     div.card-footer
       p 作成者: #{schedule.user.username}
+  div.form-group
+    label(for="shareURL") 共有用 URL:
+    - var herokuURL = process.env.HEROKU_URL ? process.env.HEROKU_URL : 'http://localhost:8000/'
+    input(type="text" value=`${herokuURL}schedules/${schedule.scheduleId}/`)#shareURL.form-control
   - var isMine = parseInt(user.id) === schedule.user.userId
   if isMine
     div
@@ -18,6 +22,8 @@ block content
       th 予定
       each user in users
         th #{user.username}
+    - var orderByCandidateName = candidates.sort((a, b) => new Date(a.candidateName) - new Date(b.candidateName));
+    - orderByCandidateName = candidates;
     each candidate in candidates
       tr
         th #{candidate.candidateName}

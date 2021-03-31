@@ -1,25 +1,34 @@
 extends layout
 
+block append head
+  link(rel="stylesheet",
+  href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker.min.css",
+  integrity="sha256-siyOpF/pBWUPgIcQi17TLBkjvNgNQArcmwJB8YvkAgg=",
+  crossorigin="anonymous")
+
 block content
   h3.my-3 予定の編集
-  form(method="post", action=`/schedules/${schedule.scheduleId}?edit=1`)
+  form(method="post", action=`/schedules/${schedule.scheduleId}?edit=1`, novalidate).needs-validation
     input(type="hidden" name="_csrf" value!=csrfToken)
     div.form-group
       label(for="scheduleName") 予定名
-      input(type="text" name="scheduleName" value=schedule.scheduleName)#scheduleName.form-control
+      input(type="text" name="scheduleName" value=schedule.scheduleName required)#scheduleName.form-control
+      div.invalid-feedback 予定名を入力してください
     div.form-group
       label(for="memo") メモ
       textarea(name="memo")#memo.form-control #{schedule.memo}
     div.form-group
       label 既存の日程候補
       ul.list-group
+        - var orderByCandidateName = candidates.sort((a, b) => new Date(a.candidateName) - new Date(b.candidateName));
+        - orderByCandidateName = candidates;
         each candidate in candidates
           li.list-group-item #{candidate.candidateName}
-      label(for="candidates").my-2 候補日程の追加 (改行して複数入力してください)
-      textarea(name="candidates")#candidates.form-control
+      label(for="candidates").my-2 候補日程の追加
+      input(name="candidates")#candidates.form-control
     div
       button(type="submit").btn.btn-info 以上の内容で予定を編集する
   h3.my-3 危険な変更
-  form(method="post", action=`/schedules/${schedule.scheduleId}?delete=1`)
+  form(method="post", action=`/schedules/${schedule.scheduleId}?delete=1`)#delete-schedule-form
     input(type="hidden" name="_csrf" value!=csrfToken)
     button(type="submit").btn.btn-danger この予定を削除する
