@@ -19,6 +19,8 @@ block content
       textarea(name="candidates")#candidates.form-control
     div
       button(type="submit").btn.btn-info 以上の内容で予定を編集する
+  block content
+    a(href="/").btn.btn-info.my-3 
   h3.my-3 危険な変更
   form(method="post", action=`/schedules/${schedule.scheduleId}?delete=1`)
     input(type="hidden" name="_csrf" value!=csrfToken)
