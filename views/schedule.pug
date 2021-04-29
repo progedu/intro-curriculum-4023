@@ -8,6 +8,14 @@ block content
       p(style="white-space:pre;") #{schedule.memo}
     div.card-footer
       p 作成者: #{schedule.user.username}
+  div.form-group
+    // コピーボタンを実装したかったのですが出来ませんでした。
+    div
+      label(for="scheduleURL") 共有用URL:
+      -var herokuURL = process.env.HEROKU_URL ? process.env.HEROKU_URL : 'http://localhost:8000/'
+      input(id="copyTarget" type="text" value=`${herokuURL}schedules/${schedule.scheduleId}/` readonly)
+      button(onclick="copyToClipboard()") URLをコピー
+      //
   - var isMine = parseInt(user.id) === schedule.user.userId
   if isMine
     div
