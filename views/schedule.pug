@@ -5,6 +5,8 @@ block content
     div.card-header
       h4 #{schedule.scheduleName}
     div.card-body
+      p 開催場所: #{schedule.schedulePlace}
+    div.card-body
       p(style="white-space:pre;") #{schedule.memo}
     div.card-footer
       p 作成者: #{schedule.user.username}
