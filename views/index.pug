@@ -10,12 +10,18 @@ block content
     - var hasSchedule = schedules.length > 0
     if hasSchedule
       h3.my-3 あなたの作った予定一覧
-      table.table
+      table.table.table-striped.table-hover
         tr
           th 予定名
           th 更新日時
+          th 経過時間表示
         each schedule in schedules
           tr
             td
               a(href=`/schedules/${schedule.scheduleId}`) #{schedule.scheduleName}
+              - let timeWithIn = new Date() - schedule.updatedAt
+              if timeWithIn < 1000 * 60 * 10
+                small
+                  badge.badge-pill.badge-danger new
             td #{schedule.formattedUpdatedAt}
+            td #{schedule.formattedPassedTime}

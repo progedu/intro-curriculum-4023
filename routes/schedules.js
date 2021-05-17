@@ -21,7 +21,7 @@ router.post('/', authenticationEnsurer, csrfProtection, (req, res, next) => {
   Schedule.create({
     scheduleId: scheduleId,
     scheduleName: req.body.scheduleName.slice(0, 255) || '（名称未設定）',
-    memo: req.body.memo,
+    memo: req.body.memo.slice(0, 255) || '（記入がありません）',
     createdBy: req.user.id,
     updatedAt: updatedAt
   }).then((schedule) => {
@@ -164,7 +164,7 @@ router.post('/:scheduleId', authenticationEnsurer, csrfProtection, (req, res, ne
         schedule.update({
           scheduleId: schedule.scheduleId,
           scheduleName: req.body.scheduleName.slice(0, 255) || '（名称未設定）',
-          memo: req.body.memo,
+          memo: req.body.memo.slice(0, 255) || '（記入がありません）',
           createdBy: req.user.id,
           updatedAt: updatedAt
         }).then((schedule) => {

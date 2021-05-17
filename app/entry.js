@@ -1,4 +1,6 @@
 'use strict';
+import Darkmode from 'darkmode-js';
+import flatpickr from 'flatpickr';
 import $ from 'jquery';
 const global = Function('return this;')();
 global.jQuery = $;
@@ -39,3 +41,24 @@ buttonSelfComment.click(() => {
       });
   }
 });
+
+function addDarkmodeWidget() {
+  const options = {
+    time: '0.1s',
+    saveInCookies: false,
+    label: '🌓',
+    autoMatchOsTheme: true
+  }
+  const darkmode = new Darkmode(options);
+  darkmode.showWidget();
+}
+window.addEventListener('load', addDarkmodeWidget);
+
+flatpickr('#candidates');
+
+const config = {
+  enableTime: true,
+  dateFormat: "Y/m/d H:i",
+  minDate: "today"
+}
+flatpickr('#candidates', config);
