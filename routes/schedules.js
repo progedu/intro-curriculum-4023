@@ -20,7 +20,7 @@ router.post('/', authenticationEnsurer, csrfProtection, (req, res, next) => {
   const updatedAt = new Date();
   Schedule.create({
     scheduleId: scheduleId,
-    scheduleName: req.body.scheduleName.slice(0, 255) || '（名称未設定）',
+    scheduleName: setScheduleName(req),
     memo: req.body.memo,
     createdBy: req.user.id,
     updatedAt: updatedAt
@@ -163,7 +163,7 @@ router.post('/:scheduleId', authenticationEnsurer, csrfProtection, (req, res, ne
         const updatedAt = new Date();
         schedule.update({
           scheduleId: schedule.scheduleId,
-          scheduleName: req.body.scheduleName.slice(0, 255) || '（名称未設定）',
+          scheduleName: setScheduleName(req),
           memo: req.body.memo,
           createdBy: req.user.id,
           updatedAt: updatedAt
@@ -237,6 +237,10 @@ function createCandidatesAndRedirect(candidateNames, scheduleId, res) {
 
 function parseCandidateNames(req) {
   return req.body.candidates.trim().split('\n').map((s) => s.trim()).filter((s) => s !== "");
+}
+
+function setScheduleName (req) {
+  return req.body.scheduleName.slice(0, 255) || '（名称未設定）';
 }
 
 module.exports = router;
