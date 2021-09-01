@@ -23,6 +23,17 @@ $('.availability-toggle-button').each((i, e) => {
         button.removeClass('btn-danger btn-secondary btn-success');
         button.addClass(buttonStyles[data.availability]);
       });
+      
+    const index = i + 1;
+    const count = $(`.count-${index}`);
+    let cnt = count.data('count');
+    if (nextAvailability === 2) {
+      cnt++;
+    } else if (nextAvailability === 0){
+      cnt--;
+    }
+    count.data('count', cnt);
+    count.text(cnt);
   });
 });
 
