@@ -3,9 +3,11 @@ const express = require('express');
 const router = express.Router();
 const Schedule = require('../models/schedule');
 const moment = require('moment-timezone');
+const csrf = require('csurf');
+const csrfProtection = csrf({ cookie: true });
 
 /* GET home page. */
-router.get('/', (req, res, next) => {
+router.get('/', csrfProtection, (req, res, next) => {
   const title = '予定調整くん';
   if (req.user) {
     Schedule.findAll({
@@ -20,7 +22,8 @@ router.get('/', (req, res, next) => {
       res.render('index', {
         title: title,
         user: req.user,
-        schedules: schedules
+        schedules: schedules,
+        csrfToken: req.csrfToken()   // ここを追加
       });
     });
   } else {
